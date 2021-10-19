@@ -80,7 +80,7 @@ static void init()
 	float right_wall = 320 / 2 + 40;
 
 	{
-		cpShape *ground = cpSegmentShapeNew(staticBody, cpv(0, 200), cpv(320, 200), 10.);
+		cpShape *ground = cpBoxShapeNew2(staticBody, cpBBNewForExtents(cpv(160, 200), 180., 5.), 0);
 		cpShapeSetElasticity(ground, .2);
 		cpShapeSetFriction(ground, 1.);
 		cpShapeSetCollisionType(ground, 0);
@@ -88,7 +88,7 @@ static void init()
 	}
 
 	{
-		cpShape *left = cpSegmentShapeNew(staticBody, cpv(left_wall, 200), cpv(left_wall, 0), 10.);
+		cpShape *left = cpBoxShapeNew2(staticBody, cpBBNewForExtents(cpv(160 - 40, 100), 5., 110.), 0);
 		cpShapeSetElasticity(left, .2);
 		cpShapeSetFriction(left, 1.);
 		cpShapeSetCollisionType(left, 0);
@@ -96,7 +96,7 @@ static void init()
 	}
 
 	{
-		cpShape *right = cpSegmentShapeNew(staticBody, cpv(right_wall, 200), cpv(right_wall, 0), 10.);
+		cpShape *right = cpBoxShapeNew2(staticBody, cpBBNewForExtents(cpv(160 + 40, 100), 5., 110.), 0);
 		cpShapeSetElasticity(right, .2);
 		cpShapeSetFriction(right, 1.);
 		cpShapeSetCollisionType(right, 0);
@@ -231,6 +231,31 @@ static void display()
 	ball_pos = cpBodyLocalToWorld(ballBody, cpv(ball_radius, 0));
 	glVertex2f(ball_pos.x, ball_pos.y);
 	glVertex2f(right_hook_pos.x, right_hook_pos.y);
+
+	glEnd();
+
+	glBegin(GL_QUADS);
+
+	cpSpaceBBQuery(space, cpBBNew(0, 0, 320, 200), CP_SHAPE_FILTER_ALL, [](cpShape *shape, void *data) {
+		if (cpShapeGetBody(shape) != cpSpaceGetStaticBody(space))
+			return;
+
+#if 0
+		cpVect a = cpSegmentShapeGetA(shape);
+		cpVect b = cpSegmentShapeGetB(shape);
+		cpFloat r = cpSegmentShapeGetRadius(shape);
+#endif
+
+		int n = cpPolyShapeGetCount(shape);
+		for (int i = 0; i < n; ++i) {
+			cpVect u = cpPolyShapeGetVert(shape, i);
+			cpVect v = cpPolyShapeGetVert(shape, (i + 1) % n);
+
+			glVertex2f(u.x, u.y);
+			glVertex2f(v.x, v.y);
+		}
+	}, NULL);
+
 	glEnd();
 
 	SDL_GL_SwapBuffers();
@@ -414,8 +439,6 @@ int main(int argc, char *argv[])
 
 	bool running = true;
 	while (running) {
-		display();
-
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
@@ -443,6 +466,8 @@ int main(int argc, char *argv[])
 
 		cpSpaceStep(space, 1. / 60);
 		//cpBodyResetForces(ballBody);
+
+		display();
 
 		SDL_Delay(10);
 	}
