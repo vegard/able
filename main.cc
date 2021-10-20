@@ -14,7 +14,7 @@ extern "C" {
 
 static const cpFloat ball_radius = 8;
 static const cpFloat hook_radius = 1.;
-static const cpFloat max_rope_length = 100.;
+static const cpFloat max_rope_length = 40.;
 
 static const cpFloat hook_velocity = 10.;
 
@@ -43,6 +43,8 @@ static cpConstraint *rightHookOutJoint;
 static bool right_hook_out = false;
 static cpBody *right_hook_stop;
 static cpConstraint *rightHookSpring;
+
+static float camera_x, camera_y;
 
 static void init()
 {
@@ -172,17 +174,11 @@ static void draw_sphere(cpVect pos, cpVect rot, float radius)
 
 static void display()
 {
+	glClearColor(1, 1, 1, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 
-	glColor4f(1, 1, 1, 1);
-
-	glBegin(GL_QUADS);
-	glVertex2f(0, 0);
-	glVertex2f(320, 0);
-	glVertex2f(320, 200);
-	glVertex2f(0, 200);
-	glEnd();
+	glTranslatef(-camera_x + 320 / 2, -camera_y + 200 / 2, 0);
 
 	cpVect ball_pos = cpBodyGetPosition(ballBody);
 
@@ -401,6 +397,13 @@ static void update()
 	if (state[SDLK_o] && rightHookSpring) {
 		cpFloat length = cpDampedSpringGetRestLength(rightHookSpring);
 		cpDampedSpringSetRestLength(rightHookSpring, fmax(0., length - reel_in_velocity));
+	}
+
+	/* Update camera */
+	{
+		cpVect pos = cpBodyGetPosition(ballBody);
+		camera_x = .5 * camera_x + .5 * pos.x;
+		camera_y = .5 * camera_y + .5 * pos.y;
 	}
 }
 
