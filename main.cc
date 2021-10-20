@@ -182,36 +182,88 @@ static void display()
 
 	cpVect ball_pos = cpBodyGetPosition(ballBody);
 
-	cpVect left_hook_pos;
-	if (left_hook_out)
-		left_hook_pos = cpBodyGetPosition(leftHookBody);
-	else
-		left_hook_pos = cpBodyLocalToWorld(ballBody, cpv(-ball_radius, 0));
-
-	cpVect right_hook_pos;
-	if (right_hook_out)
-		right_hook_pos = cpBodyGetPosition(rightHookBody);
-	else
-		right_hook_pos = cpBodyLocalToWorld(ballBody, cpv(ball_radius, 0));
-
 	draw_sphere(ball_pos, cpBodyGetRotation(ballBody), ball_radius);
-	draw_sphere(left_hook_pos, cpBodyGetRotation(leftHookBody), hook_radius);
-	draw_sphere(right_hook_pos, cpBodyGetRotation(rightHookBody), hook_radius);
+	//draw_sphere(left_hook_pos, cpBodyGetRotation(leftHookBody), hook_radius);
+	//draw_sphere(right_hook_pos, cpBodyGetRotation(rightHookBody), hook_radius);
+
+	const float arm_length = max_rope_length / 2.;
 
 	glBegin(GL_LINES);
-	ball_pos = cpBodyLocalToWorld(ballBody, cpv(-ball_radius, 0));
-	glVertex2f(ball_pos.x, ball_pos.y);
-	glVertex2f(left_hook_pos.x, left_hook_pos.y);
 
-	ball_pos = cpBodyLocalToWorld(ballBody, cpv(ball_radius, 0));
-	glVertex2f(ball_pos.x, ball_pos.y);
-	glVertex2f(right_hook_pos.x, right_hook_pos.y);
+	// rendering the single spring as upper arm + lower arm
+	//
+	// this is a triangle problem where:
+	// - the positions of two vertices are known
+	//   (hence also the length between them)
+	// - the other two sides have known lengths
+	// - we want to find the position of the last vertex
+	//
+	// we can use two circle equations and set them equal to find potentially two solutions
+	// see https://mathworld.wolfram.com/Circle-CircleIntersection.html
+
+	if (left_hook_out) {
+		cpVect left_hook_pos = cpBodyGetPosition(leftHookBody);
+		cpVect left_shoulder_pos = cpBodyLocalToWorld(ballBody, cpv(-ball_radius, 0));
+
+		cpVect delta = cpvsub(left_hook_pos, left_shoulder_pos);
+		float d2 = cpvlengthsq(delta);
+		float x2 = d2 / 4.;
+
+		if (arm_length * arm_length < x2) {
+			glVertex2f(left_shoulder_pos.x, left_shoulder_pos.y);
+			glVertex2f(left_hook_pos.x, left_hook_pos.y);
+		} else {
+			float y2 = arm_length * arm_length - x2;
+			float x = sqrt(x2);
+			float y = sqrt(y2);
+
+			float angle = atan2(delta.y, delta.x);
+
+			cpVect left_elbow_pos = left_shoulder_pos + cpvrotate(cpv(x, -y), cpv(cos(angle), sin(angle)));
+
+			// left upper arm
+			glVertex2f(left_shoulder_pos.x, left_shoulder_pos.y);
+			glVertex2f(left_elbow_pos.x, left_elbow_pos.y);
+			// left lower arm
+			glVertex2f(left_elbow_pos.x, left_elbow_pos.y);
+			glVertex2f(left_hook_pos.x, left_hook_pos.y);
+		}
+	}
+
+	if (right_hook_out) {
+		cpVect right_hook_pos = cpBodyGetPosition(rightHookBody);
+		cpVect right_shoulder_pos = cpBodyLocalToWorld(ballBody, cpv(ball_radius, 0));
+
+		cpVect delta = cpvsub(right_hook_pos, right_shoulder_pos);
+		float d2 = cpvlengthsq(delta);
+		float x2 = d2 / 4.;
+
+		if (arm_length * arm_length < x2) {
+			glVertex2f(right_shoulder_pos.x, right_shoulder_pos.y);
+			glVertex2f(right_hook_pos.x, right_hook_pos.y);
+		} else {
+			float y2 = arm_length * arm_length - x2;
+			float x = sqrt(x2);
+			float y = sqrt(y2);
+
+			float angle = atan2(delta.y, delta.x);
+
+			cpVect right_elbow_pos = right_shoulder_pos + cpvrotate(cpv(x, y), cpv(cos(angle), sin(angle)));
+
+			// right upper arm
+			glVertex2f(right_shoulder_pos.x, right_shoulder_pos.y);
+			glVertex2f(right_elbow_pos.x, right_elbow_pos.y);
+			// right lower arm
+			glVertex2f(right_elbow_pos.x, right_elbow_pos.y);
+			glVertex2f(right_hook_pos.x, right_hook_pos.y);
+		}
+	}
 
 	glEnd();
 
 	glBegin(GL_LINES);
 
-	cpSpaceBBQuery(space, cpBBNew(0, 0, 320, 200), CP_SHAPE_FILTER_ALL, [](cpShape *shape, void *data) {
+	cpSpaceBBQuery(space, cpBBNew(ball_pos.x - 160, ball_pos.y - 100, ball_pos.x + 160, ball_pos.y + 100), CP_SHAPE_FILTER_ALL, [](cpShape *shape, void *data) {
 		if (cpShapeGetBody(shape) != cpSpaceGetStaticBody(space))
 			return;
 
