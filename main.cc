@@ -30,6 +30,7 @@ static SDL_Surface *surface;
 
 static cpSpace *space;
 static cpBody *ballBody;
+static cpBody *torsoBody;
 
 static cpBody *leftHookBody;
 static cpShape *leftHookShape;
@@ -93,6 +94,7 @@ static void init()
 		cpFloat moment = cpMomentForCircle(mass, 0, ball_radius, cpvzero);
 		//cpFloat moment = 100. * cpMomentForCircle(mass, 0, ball_radius, cpvzero);
 
+		// ball = head
 		ballBody = cpSpaceAddBody(space, cpBodyNew(mass, moment));
 		cpBodySetPosition(ballBody, cpv(160, 80));
 
@@ -102,6 +104,20 @@ static void init()
 
 		cpSpaceAddConstraint(space, cpDampedRotarySpringNew(staticBody, ballBody, 0., 1000., 100.));
 		cpShapeSetFilter(ballShape, cpShapeFilterNew(1, CP_ALL_CATEGORIES, CP_ALL_CATEGORIES));
+	}
+
+	{
+		torsoBody = cpSpaceAddBody(space, cpBodyNew(1., 1.));
+		cpBodySetPosition(torsoBody, cpv(160, 95));
+
+		cpShape *torsoShape = cpBoxShapeNew2(torsoBody, cpBBNewForExtents(cpv(0, 0), 4., 10.), 0);
+		cpShapeSetFilter(torsoShape, cpShapeFilterNew(1, CP_ALL_CATEGORIES, CP_ALL_CATEGORIES));
+
+		//cpSpaceAddConstraint(space, cpPinJointNew(ballBody, torsoBody, cpv(0, ball_radius), cpv(0, 0)));
+		cpSpaceAddConstraint(space, cpPivotJointNew2(ballBody, torsoBody, cpv(0, ball_radius), cpv(0, -10.)));
+		cpSpaceAddConstraint(space, cpRotaryLimitJointNew(ballBody, torsoBody, -.3, .3));
+
+		cpSpaceAddShape(space, torsoShape);
 	}
 
 	{
@@ -264,23 +280,33 @@ static void display()
 
 	glEnd();
 
-	glBegin(GL_LINES);
-
 	cpSpaceBBQuery(space, cpBBNew(ball_pos.x - 160, ball_pos.y - 100, ball_pos.x + 160, ball_pos.y + 100), CP_SHAPE_FILTER_ALL, [](cpShape *shape, void *data) {
-		if (cpShapeGetBody(shape) != cpSpaceGetStaticBody(space))
+		cpBody *body = cpShapeGetBody(shape);
+		if (body != cpSpaceGetStaticBody(space) && body != torsoBody)
 			return;
+
+		glPushMatrix();
+		cpVect pos = cpBodyGetPosition(body);
+		cpVect rot = cpBodyGetRotation(body);
+		glTranslatef(pos.x, pos.y, 0);
+		glRotatef(360. * atan2(rot.y, rot.x) / 2. / M_PI, 0, 0, 1);
+
+		glBegin(GL_LINES);
 
 		int n = cpPolyShapeGetCount(shape);
 		for (int i = 0; i < n; ++i) {
 			cpVect u = cpPolyShapeGetVert(shape, i);
 			cpVect v = cpPolyShapeGetVert(shape, (i + 1) % n);
 
+//if (body == torsoBody) printf("%f %f -- %f %f\n", u.x, u.y, v.x, v.y);
+
 			glVertex2f(u.x, u.y);
 			glVertex2f(v.x, v.y);
 		}
-	}, NULL);
+		glEnd();
 
-	glEnd();
+		glPopMatrix();
+	}, NULL);
 
 	SDL_GL_SwapBuffers();
 }
