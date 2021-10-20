@@ -21,7 +21,8 @@ static const cpFloat hook_velocity = 10.;
 static const cpFloat hook_stiffness = 50.;
 static const cpFloat hook_damping = .5;
 
-static const cpFloat reel_in_velocity = 1.;
+static const cpFloat reel_in_velocity = .5;
+static const cpFloat min_rope_length = 5.;
 
 /* Runtime state */
 
@@ -36,6 +37,7 @@ static cpConstraint *leftHookOutJoint;
 static bool left_hook_out = false;
 static cpBody *left_hook_stop;
 static cpConstraint *leftHookSpring;
+static float leftHookLength;
 
 static cpBody *rightHookBody;
 static cpShape *rightHookShape;
@@ -43,6 +45,7 @@ static cpConstraint *rightHookOutJoint;
 static bool right_hook_out = false;
 static cpBody *right_hook_stop;
 static cpConstraint *rightHookSpring;
+static float rightHookLength;
 
 static float camera_x, camera_y;
 
@@ -402,6 +405,7 @@ static void keyboard(SDL_KeyboardEvent *key)
 static void keyboard_up(SDL_KeyboardEvent *key)
 {
 	switch (key->keysym.sym) {
+
 	case SDLK_LEFT:
 		break;
 	case SDLK_RIGHT:
@@ -421,9 +425,12 @@ static void update()
 		cpVect pos = cpBodyGetPosition(leftHookBody);
 		cpSpaceRemoveBody(space, leftHookBody);
 
+		leftHookLength = cpvdist(pos, cpBodyGetPosition(ballBody)) - ball_radius - hook_radius;
+		leftHookLength = fmax(min_rope_length, leftHookLength);
+
 		leftHookSpring = cpSpaceAddConstraint(space, cpDampedSpringNew(ballBody, left_hook_stop,
 			cpv(-ball_radius, 0), cpBodyWorldToLocal(left_hook_stop, pos),
-			cpvdist(pos, cpBodyGetPosition(ballBody)) - ball_radius - hook_radius,
+			leftHookLength,
 			hook_stiffness, hook_damping));
 
 		left_hook_stop = NULL;
@@ -433,22 +440,25 @@ static void update()
 		cpVect pos = cpBodyGetPosition(rightHookBody);
 		cpSpaceRemoveBody(space, rightHookBody);
 
+		rightHookLength = cpvdist(pos, cpBodyGetPosition(ballBody)) - ball_radius - hook_radius;
+		rightHookLength = fmax(min_rope_length, rightHookLength);
+
 		rightHookSpring = cpSpaceAddConstraint(space, cpDampedSpringNew(ballBody, right_hook_stop,
 			cpv(ball_radius, 0), cpBodyWorldToLocal(right_hook_stop, pos),
-			cpvdist(pos, cpBodyGetPosition(ballBody)) - ball_radius - hook_radius,
+			rightHookLength,
 			hook_stiffness, hook_damping));
 
 		right_hook_stop = NULL;
 	}
 
-	if (state[SDLK_w] && leftHookSpring) {
+	if (leftHookSpring && state[SDLK_w]) {
 		cpFloat length = cpDampedSpringGetRestLength(leftHookSpring);
-		cpDampedSpringSetRestLength(leftHookSpring, fmax(0., length - reel_in_velocity));
+		cpDampedSpringSetRestLength(leftHookSpring, fmax(min_rope_length, length - reel_in_velocity));
 	}
 
 	if (state[SDLK_o] && rightHookSpring) {
 		cpFloat length = cpDampedSpringGetRestLength(rightHookSpring);
-		cpDampedSpringSetRestLength(rightHookSpring, fmax(0., length - reel_in_velocity));
+		cpDampedSpringSetRestLength(rightHookSpring, fmax(min_rope_length, length - reel_in_velocity));
 	}
 
 	/* Update camera */
