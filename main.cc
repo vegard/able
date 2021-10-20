@@ -31,12 +31,14 @@ static cpSpace *space;
 static cpBody *ballBody;
 
 static cpBody *leftHookBody;
+static cpShape *leftHookShape;
 static cpConstraint *leftHookOutJoint;
 static bool left_hook_out = false;
 static cpBody *left_hook_stop;
 static cpConstraint *leftHookSpring;
 
 static cpBody *rightHookBody;
+static cpShape *rightHookShape;
 static cpConstraint *rightHookOutJoint;
 static bool right_hook_out = false;
 static cpBody *right_hook_stop;
@@ -79,29 +81,7 @@ static void init()
 	float left_wall = 320 / 2 - 20;
 	float right_wall = 320 / 2 + 40;
 
-	{
-		cpShape *ground = cpBoxShapeNew2(staticBody, cpBBNewForExtents(cpv(160, 200), 180., 5.), 0);
-		cpShapeSetElasticity(ground, .2);
-		cpShapeSetFriction(ground, 1.);
-		cpShapeSetCollisionType(ground, 0);
-		cpSpaceAddShape(space, ground);
-	}
-
-	{
-		cpShape *left = cpBoxShapeNew2(staticBody, cpBBNewForExtents(cpv(160 - 40, 100), 5., 110.), 0);
-		cpShapeSetElasticity(left, .2);
-		cpShapeSetFriction(left, 1.);
-		cpShapeSetCollisionType(left, 0);
-		cpSpaceAddShape(space, left);
-	}
-
-	{
-		cpShape *right = cpBoxShapeNew2(staticBody, cpBBNewForExtents(cpv(160 + 40, 100), 5., 110.), 0);
-		cpShapeSetElasticity(right, .2);
-		cpShapeSetFriction(right, 1.);
-		cpShapeSetCollisionType(right, 0);
-		cpSpaceAddShape(space, right);
-	}
+#include "level.c"
 
 	{
 		cpFloat mass = 1.;
@@ -109,7 +89,7 @@ static void init()
 		//cpFloat moment = 100. * cpMomentForCircle(mass, 0, ball_radius, cpvzero);
 
 		ballBody = cpSpaceAddBody(space, cpBodyNew(mass, moment));
-		cpBodySetPosition(ballBody, cpv(160, 100));
+		cpBodySetPosition(ballBody, cpv(160, 80));
 
 		cpShape *ballShape = cpSpaceAddShape(space, cpCircleShapeNew(ballBody, ball_radius, cpvzero));
 		cpShapeSetElasticity(ballShape, 1.);
@@ -127,7 +107,7 @@ static void init()
 		leftHookBody = cpBodyNew(mass, moment);
 		cpBodySetPosition(leftHookBody, cpv(160 - ball_radius - hook_radius, 100));
 
-		cpShape *leftHookShape = cpSpaceAddShape(space, cpCircleShapeNew(leftHookBody, hook_radius, cpvzero));
+		leftHookShape = cpCircleShapeNew(leftHookBody, hook_radius, cpvzero);
 		cpShapeSetElasticity(leftHookShape, 0.);
 		cpShapeSetFriction(leftHookShape, 1.);
 		cpShapeSetCollisionType(leftHookShape, 1);
@@ -136,7 +116,7 @@ static void init()
 		rightHookBody = cpBodyNew(mass, moment);
 		cpBodySetPosition(rightHookBody, cpv(160 + ball_radius + hook_radius, 100));
 
-		cpShape *rightHookShape = cpSpaceAddShape(space, cpCircleShapeNew(rightHookBody, hook_radius, cpvzero));
+		rightHookShape = cpCircleShapeNew(rightHookBody, hook_radius, cpvzero);
 		cpShapeSetElasticity(rightHookShape, 0.);
 		cpShapeSetFriction(rightHookShape, 1.);
 		cpShapeSetCollisionType(rightHookShape, 1);
@@ -160,7 +140,6 @@ static void init()
 			if (v == rightHookBody)
 				right_hook_stop = u;
 
-			//return false;
 			return true;
 		};
 	}
@@ -234,17 +213,11 @@ static void display()
 
 	glEnd();
 
-	glBegin(GL_QUADS);
+	glBegin(GL_LINES);
 
 	cpSpaceBBQuery(space, cpBBNew(0, 0, 320, 200), CP_SHAPE_FILTER_ALL, [](cpShape *shape, void *data) {
 		if (cpShapeGetBody(shape) != cpSpaceGetStaticBody(space))
 			return;
-
-#if 0
-		cpVect a = cpSegmentShapeGetA(shape);
-		cpVect b = cpSegmentShapeGetB(shape);
-		cpFloat r = cpSegmentShapeGetRadius(shape);
-#endif
 
 		int n = cpPolyShapeGetCount(shape);
 		for (int i = 0; i < n; ++i) {
@@ -290,6 +263,8 @@ static void keyboard(SDL_KeyboardEvent *key)
 
 			cpVect ball_pos = cpBodyGetPosition(ballBody);
 
+			cpSpaceAddShape(space, leftHookShape);
+
 			//cpBodySetPosition(leftHookBody, cpBodyLocalToWorld(ballBody, cpv(-ball_radius - hook_radius, 0)));
 			cpBodySetPosition(leftHookBody, cpBodyLocalToWorld(ballBody, cpv(-ball_radius + 2. * hook_radius, 0)));
 			cpBodySetVelocity(leftHookBody, cpBodyGetVelocity(ballBody));
@@ -314,6 +289,8 @@ static void keyboard(SDL_KeyboardEvent *key)
 
 			if (cpSpaceContainsBody(space, leftHookBody))
 				cpSpaceRemoveBody(space, leftHookBody);
+			if (cpSpaceContainsShape(space, leftHookShape))
+				cpSpaceRemoveShape(space, leftHookShape);
 		}
 
 		break;
@@ -327,6 +304,8 @@ static void keyboard(SDL_KeyboardEvent *key)
 			cpSpaceAddConstraint(space, rightHookOutJoint);
 
 			cpVect ball_pos = cpBodyGetPosition(ballBody);
+
+			cpSpaceAddShape(space, rightHookShape);
 
 			//cpBodySetPosition(rightHookBody, cpBodyLocalToWorld(ballBody, cpv(ball_radius + hook_radius, 0)));
 			cpBodySetPosition(rightHookBody, cpBodyLocalToWorld(ballBody, cpv(ball_radius - 2. * hook_radius, 0)));
@@ -352,6 +331,8 @@ static void keyboard(SDL_KeyboardEvent *key)
 
 			if (cpSpaceContainsBody(space, rightHookBody))
 				cpSpaceRemoveBody(space, rightHookBody);
+			if (cpSpaceContainsShape(space, rightHookShape))
+				cpSpaceRemoveShape(space, rightHookShape);
 		}
 
 		break;
