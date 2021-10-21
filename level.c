@@ -25,6 +25,7 @@ cpShape *level = cpPolyShapeNew(staticBody, 20, verts, cpTransformIdentity, 0);
 cpShapeSetElasticity(level, .2);
 cpShapeSetFriction(level, 1.);
 cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
 cpSpaceAddShape(space, level);
 }
 {
@@ -46,6 +47,7 @@ cpShape *level = cpPolyShapeNew(staticBody, 12, verts, cpTransformIdentity, 0);
 cpShapeSetElasticity(level, .2);
 cpShapeSetFriction(level, 1.);
 cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
 cpSpaceAddShape(space, level);
 }
 {
@@ -72,6 +74,7 @@ cpShape *level = cpPolyShapeNew(staticBody, 17, verts, cpTransformIdentity, 0);
 cpShapeSetElasticity(level, .2);
 cpShapeSetFriction(level, 1.);
 cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
 cpSpaceAddShape(space, level);
 }
 {
@@ -96,6 +99,7 @@ cpShape *level = cpPolyShapeNew(staticBody, 15, verts, cpTransformIdentity, 0);
 cpShapeSetElasticity(level, .2);
 cpShapeSetFriction(level, 1.);
 cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
 cpSpaceAddShape(space, level);
 }
 {
@@ -120,6 +124,7 @@ cpShape *level = cpPolyShapeNew(staticBody, 15, verts, cpTransformIdentity, 0);
 cpShapeSetElasticity(level, .2);
 cpShapeSetFriction(level, 1.);
 cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
 cpSpaceAddShape(space, level);
 }
 {
@@ -149,6 +154,7 @@ cpShape *level = cpPolyShapeNew(staticBody, 20, verts, cpTransformIdentity, 0);
 cpShapeSetElasticity(level, .2);
 cpShapeSetFriction(level, 1.);
 cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
 cpSpaceAddShape(space, level);
 }
 {
@@ -173,5 +179,6 @@ cpShape *level = cpPolyShapeNew(staticBody, 15, verts, cpTransformIdentity, 0);
 cpShapeSetElasticity(level, .2);
 cpShapeSetFriction(level, 1.);
 cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
 cpSpaceAddShape(space, level);
 }

@@ -24,6 +24,15 @@ static const cpFloat hook_damping = .5;
 static const cpFloat reel_in_velocity = .5;
 static const cpFloat min_rope_length = 5.;
 
+/* Definitions */
+
+enum collision_categories {
+	CP_CATEGORY_LEVEL,
+	CP_CATEGORY_PLAYER,
+	CP_CATEGORY_RAGDOLL,
+	CP_CATEGORY_CAMERA,
+};
+
 /* Runtime state */
 
 static SDL_Surface *surface;
@@ -111,9 +120,8 @@ static void init()
 		cpBodySetPosition(torsoBody, cpv(160, 95));
 
 		cpShape *torsoShape = cpBoxShapeNew2(torsoBody, cpBBNewForExtents(cpv(0, 0), 4., 10.), 0);
-		cpShapeSetFilter(torsoShape, cpShapeFilterNew(1, CP_ALL_CATEGORIES, CP_ALL_CATEGORIES));
+		cpShapeSetFilter(torsoShape, cpShapeFilterNew(1, 1 << CP_CATEGORY_RAGDOLL, 1 << CP_CATEGORY_CAMERA));
 
-		//cpSpaceAddConstraint(space, cpPinJointNew(ballBody, torsoBody, cpv(0, ball_radius), cpv(0, 0)));
 		cpSpaceAddConstraint(space, cpPivotJointNew2(ballBody, torsoBody, cpv(0, ball_radius), cpv(0, -10.)));
 		cpSpaceAddConstraint(space, cpRotaryLimitJointNew(ballBody, torsoBody, -.3, .3));
 
@@ -298,7 +306,33 @@ static void display()
 			cpVect u = cpPolyShapeGetVert(shape, i);
 			cpVect v = cpPolyShapeGetVert(shape, (i + 1) % n);
 
-//if (body == torsoBody) printf("%f %f -- %f %f\n", u.x, u.y, v.x, v.y);
+			glVertex2f(u.x, u.y);
+			glVertex2f(v.x, v.y);
+		}
+		glEnd();
+
+		glPopMatrix();
+	}, NULL);
+
+	glColor3f(1, 0, 0);
+
+	cpSpaceBBQuery(space, cpBBNew(ball_pos.x - 160, ball_pos.y - 100, ball_pos.x + 160, ball_pos.y + 100), cpShapeFilterNew(1, 1 << CP_CATEGORY_CAMERA, 1 << CP_CATEGORY_RAGDOLL), [](cpShape *shape, void *data) {
+		cpBody *body = cpShapeGetBody(shape);
+		if (body != torsoBody)
+			return;
+
+		glPushMatrix();
+		cpVect pos = cpBodyGetPosition(body);
+		cpVect rot = cpBodyGetRotation(body);
+		glTranslatef(pos.x, pos.y, 0);
+		glRotatef(360. * atan2(rot.y, rot.x) / 2. / M_PI, 0, 0, 1);
+
+		glBegin(GL_LINES);
+
+		int n = cpPolyShapeGetCount(shape);
+		for (int i = 0; i < n; ++i) {
+			cpVect u = cpPolyShapeGetVert(shape, i);
+			cpVect v = cpPolyShapeGetVert(shape, (i + 1) % n);
 
 			glVertex2f(u.x, u.y);
 			glVertex2f(v.x, v.y);
