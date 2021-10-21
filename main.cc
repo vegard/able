@@ -18,11 +18,14 @@ static const cpFloat max_rope_length = 40.;
 
 static const cpFloat hook_velocity = 10.;
 
-static const cpFloat hook_stiffness = 35.;
+static const cpFloat hook_stiffness = 30.;
 static const cpFloat hook_damping = 5.;
 
 static const cpFloat reel_in_velocity = .5;
 static const cpFloat min_rope_length = 5.;
+
+static const cpVect left_shoulder_offset = cpv(-ball_radius, ball_radius);
+static const cpVect right_shoulder_offset = cpv(ball_radius, ball_radius);
 
 /* Definitions */
 
@@ -153,11 +156,11 @@ static void init()
 		cpShapeSetFilter(rightHookShape, cpShapeFilterNew(1, CP_ALL_CATEGORIES, CP_ALL_CATEGORIES));
 	}
 
-	leftHookOutJoint = cpSlideJointNew(ballBody, leftHookBody, cpv(-ball_radius, 0), cpv(hook_radius, 0), 0., max_rope_length);
-	leftGripJoint = cpSlideJointNew(ballBody, staticBody, cpv(-ball_radius, 0), cpv(0, 0), 0., max_rope_length);
+	leftHookOutJoint = cpSlideJointNew(ballBody, leftHookBody, left_shoulder_offset, cpv(hook_radius, 0), 0., max_rope_length);
+	leftGripJoint = cpSlideJointNew(ballBody, staticBody, left_shoulder_offset, cpv(0, 0), 0., max_rope_length);
 
-	rightHookOutJoint = cpSlideJointNew(ballBody, rightHookBody, cpv(ball_radius, 0), cpv(-hook_radius, 0), 0., max_rope_length);
-	rightGripJoint = cpSlideJointNew(ballBody, staticBody, cpv(ball_radius, 0), cpv(0, 0), 0., max_rope_length);
+	rightHookOutJoint = cpSlideJointNew(ballBody, rightHookBody, right_shoulder_offset, cpv(-hook_radius, 0), 0., max_rope_length);
+	rightGripJoint = cpSlideJointNew(ballBody, staticBody, right_shoulder_offset, cpv(0, 0), 0., max_rope_length);
 
 	{
 		cpCollisionHandler *handler = cpSpaceAddCollisionHandler(space, 0, 1);
@@ -234,7 +237,7 @@ static void display()
 
 	if (left_hook_out) {
 		cpVect left_hook_pos = cpBodyGetPosition(leftHookBody);
-		cpVect left_shoulder_pos = cpBodyLocalToWorld(ballBody, cpv(-ball_radius, 0));
+		cpVect left_shoulder_pos = cpBodyLocalToWorld(ballBody, left_shoulder_offset);
 
 		cpVect delta = cpvsub(left_hook_pos, left_shoulder_pos);
 		float d2 = cpvlengthsq(delta);
@@ -263,7 +266,7 @@ static void display()
 
 	if (right_hook_out) {
 		cpVect right_hook_pos = cpBodyGetPosition(rightHookBody);
-		cpVect right_shoulder_pos = cpBodyLocalToWorld(ballBody, cpv(ball_radius, 0));
+		cpVect right_shoulder_pos = cpBodyLocalToWorld(ballBody, right_shoulder_offset);
 
 		cpVect delta = cpvsub(right_hook_pos, right_shoulder_pos);
 		float d2 = cpvlengthsq(delta);
