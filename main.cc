@@ -18,8 +18,8 @@ static const cpFloat max_rope_length = 40.;
 
 static const cpFloat hook_velocity = 10.;
 
-static const cpFloat hook_stiffness = 50.;
-static const cpFloat hook_damping = .5;
+static const cpFloat hook_stiffness = 35.;
+static const cpFloat hook_damping = 5.;
 
 static const cpFloat reel_in_velocity = .5;
 static const cpFloat min_rope_length = 5.;
@@ -38,24 +38,25 @@ enum collision_categories {
 static SDL_Surface *surface;
 
 static cpSpace *space;
+static cpBody *staticBody;
 static cpBody *ballBody;
 static cpBody *torsoBody;
 
 static cpBody *leftHookBody;
 static cpShape *leftHookShape;
 static cpConstraint *leftHookOutJoint;
+static cpConstraint *leftGripJoint;
 static bool left_hook_out = false;
 static cpBody *left_hook_stop;
 static cpConstraint *leftHookSpring;
-static float leftHookLength;
 
 static cpBody *rightHookBody;
 static cpShape *rightHookShape;
 static cpConstraint *rightHookOutJoint;
+static cpConstraint *rightGripJoint;
 static bool right_hook_out = false;
 static cpBody *right_hook_stop;
 static cpConstraint *rightHookSpring;
-static float rightHookLength;
 
 static float camera_x, camera_y;
 
@@ -91,7 +92,7 @@ static void init()
 	//space->gravity = cpv(0, 700);
 	cpSpaceSetGravity(space, cpv(0, 100));
 
-	cpBody *staticBody = cpSpaceGetStaticBody(space);
+	staticBody = cpSpaceGetStaticBody(space);
 
 	float left_wall = 320 / 2 - 20;
 	float right_wall = 320 / 2 + 40;
@@ -153,7 +154,10 @@ static void init()
 	}
 
 	leftHookOutJoint = cpSlideJointNew(ballBody, leftHookBody, cpv(-ball_radius, 0), cpv(hook_radius, 0), 0., max_rope_length);
+	leftGripJoint = cpSlideJointNew(ballBody, staticBody, cpv(-ball_radius, 0), cpv(0, 0), 0., max_rope_length);
+
 	rightHookOutJoint = cpSlideJointNew(ballBody, rightHookBody, cpv(ball_radius, 0), cpv(-hook_radius, 0), 0., max_rope_length);
+	rightGripJoint = cpSlideJointNew(ballBody, staticBody, cpv(ball_radius, 0), cpv(0, 0), 0., max_rope_length);
 
 	{
 		cpCollisionHandler *handler = cpSpaceAddCollisionHandler(space, 0, 1);
@@ -393,6 +397,7 @@ static void keyboard(SDL_KeyboardEvent *key)
 			cpSpaceRemoveConstraint(space, leftHookOutJoint);
 
 			if (leftHookSpring) {
+				cpSpaceRemoveConstraint(space, leftGripJoint);
 				cpSpaceRemoveConstraint(space, leftHookSpring);
 				cpConstraintFree(leftHookSpring);
 				leftHookSpring = NULL;
@@ -435,6 +440,7 @@ static void keyboard(SDL_KeyboardEvent *key)
 			cpSpaceRemoveConstraint(space, rightHookOutJoint);
 
 			if (rightHookSpring) {
+				cpSpaceRemoveConstraint(space, rightGripJoint);
 				cpSpaceRemoveConstraint(space, rightHookSpring);
 				cpConstraintFree(rightHookSpring);
 				rightHookSpring = NULL;
@@ -485,13 +491,13 @@ static void update()
 		cpVect pos = cpBodyGetPosition(leftHookBody);
 		cpSpaceRemoveBody(space, leftHookBody);
 
-		leftHookLength = cpvdist(pos, cpBodyGetPosition(ballBody)) - ball_radius - hook_radius;
-		leftHookLength = fmax(min_rope_length, leftHookLength);
-
 		leftHookSpring = cpSpaceAddConstraint(space, cpDampedSpringNew(ballBody, left_hook_stop,
 			cpv(-ball_radius, 0), cpBodyWorldToLocal(left_hook_stop, pos),
-			leftHookLength,
+			max_rope_length,
 			hook_stiffness, hook_damping));
+
+		cpSlideJointSetAnchorB(leftGripJoint, cpBodyWorldToLocal(staticBody, pos));
+		cpSpaceAddConstraint(space, leftGripJoint);
 
 		left_hook_stop = NULL;
 	}
@@ -500,25 +506,29 @@ static void update()
 		cpVect pos = cpBodyGetPosition(rightHookBody);
 		cpSpaceRemoveBody(space, rightHookBody);
 
-		rightHookLength = cpvdist(pos, cpBodyGetPosition(ballBody)) - ball_radius - hook_radius;
-		rightHookLength = fmax(min_rope_length, rightHookLength);
-
 		rightHookSpring = cpSpaceAddConstraint(space, cpDampedSpringNew(ballBody, right_hook_stop,
 			cpv(ball_radius, 0), cpBodyWorldToLocal(right_hook_stop, pos),
-			rightHookLength,
+			max_rope_length,
 			hook_stiffness, hook_damping));
+
+		cpSlideJointSetAnchorB(rightGripJoint, cpBodyWorldToLocal(staticBody, pos));
+		cpSpaceAddConstraint(space, rightGripJoint);
 
 		right_hook_stop = NULL;
 	}
 
-	if (leftHookSpring && state[SDLK_w]) {
-		cpFloat length = cpDampedSpringGetRestLength(leftHookSpring);
-		cpDampedSpringSetRestLength(leftHookSpring, fmax(min_rope_length, length - reel_in_velocity));
+	if (leftHookSpring) {
+		if (state[SDLK_w])
+			cpDampedSpringSetRestLength(leftHookSpring, min_rope_length);
+		else
+			cpDampedSpringSetRestLength(leftHookSpring, max_rope_length);
 	}
 
-	if (state[SDLK_o] && rightHookSpring) {
-		cpFloat length = cpDampedSpringGetRestLength(rightHookSpring);
-		cpDampedSpringSetRestLength(rightHookSpring, fmax(min_rope_length, length - reel_in_velocity));
+	if (rightHookSpring) {
+		if (state[SDLK_o])
+			cpDampedSpringSetRestLength(rightHookSpring, min_rope_length);
+		else
+			cpDampedSpringSetRestLength(rightHookSpring, max_rope_length);
 	}
 
 	/* Update camera */
