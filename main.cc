@@ -1,4 +1,5 @@
 #include <cassert>
+#include <initializer_list>
 
 extern "C" {
 #include <SDL.h>
@@ -48,6 +49,11 @@ static SDL_Surface *surface;
 static cpSpace *space;
 static cpBody *staticBody;
 static cpBody *ballBody;
+static cpBody *torso;
+static cpBody *leftUpperLeg;
+static cpBody *rightUpperLeg;
+static cpBody *leftLowerLeg;
+static cpBody *rightLowerLeg;
 
 static cpBody *leftHookBody;
 static cpShape *leftHookShape;
@@ -141,11 +147,11 @@ static void init()
 		return body;
 	};
 
-	auto torso = new_ragdoll_part(1., cpv(160, 95), 8., 10., ballBody, cpv(0, ball_radius), cpv(0, -10.), -.3, .3);
-	auto leftUpperLeg = new_ragdoll_part(.5, cpv(160 - 5, 115), 3., 8., torso, cpv(-5, 10), cpv(0, -8), -.5, .5);
-	auto rightUpperLeg = new_ragdoll_part(.5, cpv(160 + 5, 115), 3., 8., torso, cpv(5, 10), cpv(0, -8), -.5, .5);
-	auto leftLowerLeg = new_ragdoll_part(.2, cpv(160 - 5, 123), 2.5, 6., leftUpperLeg, cpv(0, 8), cpv(0, -6), -.5, .5, 1 << CP_CATEGORY_PLAYER);
-	auto rightLowerLeg = new_ragdoll_part(.2, cpv(160 + 5, 123), 2.5, 6., rightUpperLeg, cpv(0, 8), cpv(0, -6), -.5, .5, 1 << CP_CATEGORY_PLAYER);
+	torso = new_ragdoll_part(1., cpv(160, 95), 8., 10., ballBody, cpv(0, ball_radius), cpv(0, -10.), -.3, .3);
+	leftUpperLeg = new_ragdoll_part(.5, cpv(160 - 5, 115), 3., 8., torso, cpv(-5, 10), cpv(0, -8), -.5, .5);
+	rightUpperLeg = new_ragdoll_part(.5, cpv(160 + 5, 115), 3., 8., torso, cpv(5, 10), cpv(0, -8), -.5, .5);
+	leftLowerLeg = new_ragdoll_part(.2, cpv(160 - 5, 123), 2.5, 6., leftUpperLeg, cpv(0, 8), cpv(0, -6), -.5, .5, 1 << CP_CATEGORY_PLAYER);
+	rightLowerLeg = new_ragdoll_part(.2, cpv(160 + 5, 123), 2.5, 6., rightUpperLeg, cpv(0, 8), cpv(0, -6), -.5, .5, 1 << CP_CATEGORY_PLAYER);
 
 	{
 		cpFloat mass = .1;
@@ -471,6 +477,21 @@ static void keyboard(SDL_KeyboardEvent *key)
 		}
 
 		break;
+
+#if 0
+	case SDLK_r:
+		{
+			//cpVect target_pos = cpv(416, -833);
+			cpVect target_pos = cpv(416, -953);
+			cpVect body_pos = cpBodyGetPosition(ballBody);
+
+			for (auto body: { ballBody, torso, leftUpperLeg, rightUpperLeg, leftLowerLeg, rightLowerLeg }) {
+				cpBodySetPosition(body, target_pos + cpBodyGetPosition(body) - body_pos);
+				cpBodySetVelocity(body, cpv(0, 0));
+			}
+		}
+		break;
+#endif
 
 	case SDLK_UP:
 		break;

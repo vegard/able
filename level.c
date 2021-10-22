@@ -1,5 +1,165 @@
 {
 static const cpVect verts[5] = {
+	cpv(574.736380, -906.068210),
+	cpv(546.298910, -1281.742200),
+	cpv(707.943530, -1286.232400),
+	cpv(745.361240, -1037.778610),
+	cpv(574.736380, -906.068210),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(287.368190, -843.954770),
+	cpv(299.341850, -1263.781700),
+	cpv(151.167640, -1263.033400),
+	cpv(124.975230, -1013.831280),
+	cpv(287.368190, -843.954770),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(435.542420, -1046.758880),
+	cpv(436.664940, -1028.424190),
+	cpv(478.572800, -1030.295080),
+	cpv(482.314590, -1041.520400),
+	cpv(435.542420, -1046.758880),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[6] = {
+	cpv(380.164180, -1028.798360),
+	cpv(414.214300, -1028.050010),
+	cpv(413.091780, -1046.384710),
+	cpv(360.706960, -1040.023680),
+	cpv(365.571270, -1027.301660),
+	cpv(380.164180, -1028.798360),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 6,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 6, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(345.894840, -868.888450),
+	cpv(365.571240, -835.348680),
+	cpv(361.829480, -806.162850),
+	cpv(336.948960, -795.912880),
+	cpv(345.894840, -868.888450),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(352.475050, -938.995810),
+	cpv(374.925680, -945.356820),
+	cpv(377.170750, -969.678350),
+	cpv(359.210230, -976.039350),
+	cpv(352.475050, -938.995810),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[4] = {
+	cpv(324.037560, -724.218020),
+	cpv(343.494780, -728.333960),
+	cpv(327.405180, -751.158790),
+	cpv(324.037560, -724.218020),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 4,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 4, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(505.887750, -799.053480),
+	cpv(574.736380, -806.911210),
+	cpv(571.742960, -819.633220),
+	cpv(500.275090, -803.917800),
+	cpv(505.887750, -799.053480),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
 	cpv(345.739850, -902.326430),
 	cpv(392.137830, -1032.540140),
 	cpv(257.434000, -1086.421680),
@@ -3416,6 +3576,2230 @@ static shape_user_data user_data = {
 	.nr_verts = 7,
 };
 cpShape *level = cpPolyShapeNew(staticBody, 7, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[4] = {
+	cpv(406.730750, -579.037200),
+	cpv(423.568750, -572.302020),
+	cpv(424.317100, -592.507590),
+	cpv(406.730750, -579.037200),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 4,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 4, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(506.261920, -599.991130),
+	cpv(517.861440, -586.146570),
+	cpv(527.964210, -604.855440),
+	cpv(512.622960, -606.352170),
+	cpv(506.261920, -599.991130),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(540.312070, -671.459020),
+	cpv(541.060420, -650.130900),
+	cpv(552.285740, -660.982050),
+	cpv(552.285740, -681.935960),
+	cpv(540.312070, -671.459020),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(434.419870, -662.104570),
+	cpv(436.290770, -640.402280),
+	cpv(456.870540, -651.627600),
+	cpv(462.857370, -660.982050),
+	cpv(434.419870, -662.104570),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(356.216820, -698.773970),
+	cpv(375.299860, -588.017450),
+	cpv(384.654290, -593.255940),
+	cpv(358.836060, -706.631670),
+	cpv(356.216820, -698.773970),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(513.557430, -701.364710),
+	cpv(529.647060, -697.622950),
+	cpv(530.021230, -711.841680),
+	cpv(507.196420, -708.848270),
+	cpv(513.557430, -701.364710),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(489.049770, -747.791180),
+	cpv(491.294840, -738.062580),
+	cpv(548.543980, -741.056000),
+	cpv(545.924730, -751.532970),
+	cpv(489.049770, -747.791180),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(397.376330, -690.916240),
+	cpv(453.128740, -729.830680),
+	cpv(450.883680, -738.436750),
+	cpv(386.899360, -694.283830),
+	cpv(397.376330, -690.916240),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(368.938860, -756.397250),
+	cpv(362.577830, -748.165350),
+	cpv(371.183930, -742.178520),
+	cpv(380.538350, -753.029660),
+	cpv(368.938860, -756.397250),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(394.008740, -803.917800),
+	cpv(404.859880, -789.324860),
+	cpv(419.078620, -788.950690),
+	cpv(427.310520, -805.040320),
+	cpv(394.008740, -803.917800),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(465.850780, -841.335510),
+	cpv(471.837620, -773.235260),
+	cpv(465.102440, -769.867640),
+	cpv(449.012810, -845.825650),
+	cpv(465.850780, -841.335510),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(379.790000, -889.604400),
+	cpv(374.177340, -868.650460),
+	cpv(391.763670, -863.411980),
+	cpv(393.634560, -877.630710),
+	cpv(379.790000, -889.604400),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(590.941910, -640.250630),
+	cpv(591.985780, -640.250630),
+	cpv(591.985780, -632.535350),
+	cpv(590.941910, -632.535350),
+	cpv(590.941910, -640.250630),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[9] = {
+	cpv(601.545910, -635.424050),
+	cpv(601.111830, -637.067370),
+	cpv(599.928440, -637.666810),
+	cpv(598.739880, -637.067370),
+	cpv(598.310970, -635.424050),
+	cpv(598.739880, -633.775590),
+	cpv(599.928440, -633.181310),
+	cpv(601.111830, -633.775590),
+	cpv(601.545910, -635.424050),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 9,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 9, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[14] = {
+	cpv(598.310970, -637.444590),
+	cpv(599.065450, -638.209420),
+	cpv(600.160990, -638.462630),
+	cpv(601.871480, -637.625460),
+	cpv(602.532930, -635.424050),
+	cpv(601.871480, -633.222640),
+	cpv(600.160990, -632.385490),
+	cpv(599.065450, -632.633540),
+	cpv(598.310970, -633.403500),
+	cpv(598.310970, -632.535350),
+	cpv(597.354960, -632.535350),
+	cpv(597.354960, -640.576200),
+	cpv(598.310970, -640.576200),
+	cpv(598.310970, -637.444590),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 14,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 14, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[16] = {
+	cpv(609.059670, -635.666940),
+	cpv(609.059670, -635.201850),
+	cpv(604.687840, -635.201850),
+	cpv(605.276950, -633.703220),
+	cpv(606.754900, -633.191630),
+	cpv(607.814270, -633.325980),
+	cpv(608.837460, -633.729070),
+	cpv(608.837460, -632.829890),
+	cpv(607.788430, -632.499160),
+	cpv(606.698060, -632.385490),
+	cpv(604.501810, -633.191630),
+	cpv(603.695650, -635.372370),
+	cpv(604.460470, -637.625460),
+	cpv(606.532690, -638.462630),
+	cpv(608.377540, -637.708140),
+	cpv(609.059670, -635.666940),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 16,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 16, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[6] = {
+	cpv(608.108820, -635.945990),
+	cpv(607.669570, -637.191390),
+	cpv(606.543030, -637.656470),
+	cpv(605.266620, -637.206890),
+	cpv(604.718850, -635.940830),
+	cpv(608.108820, -635.945990),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 6,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 6, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(610.620300, -640.576200),
+	cpv(611.571140, -640.576200),
+	cpv(611.571140, -632.535350),
+	cpv(610.620300, -632.535350),
+	cpv(610.620300, -640.576200),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(613.555520, -638.323110),
+	cpv(614.506360, -638.323110),
+	cpv(614.506360, -632.535350),
+	cpv(613.555520, -632.535350),
+	cpv(613.555520, -638.323110),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(613.555520, -640.576200),
+	cpv(614.506360, -640.576200),
+	cpv(614.506360, -639.372130),
+	cpv(613.555520, -639.372130),
+	cpv(613.555520, -640.576200),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[16] = {
+	cpv(621.441340, -635.666940),
+	cpv(621.441340, -635.201850),
+	cpv(617.069520, -635.201850),
+	cpv(617.658630, -633.703220),
+	cpv(619.136570, -633.191630),
+	cpv(620.195940, -633.325980),
+	cpv(621.219130, -633.729070),
+	cpv(621.219130, -632.829890),
+	cpv(620.170100, -632.499160),
+	cpv(619.079730, -632.385490),
+	cpv(616.883480, -633.191630),
+	cpv(616.077330, -635.372370),
+	cpv(616.842140, -637.625460),
+	cpv(618.914360, -638.462630),
+	cpv(620.759210, -637.708140),
+	cpv(621.441340, -635.666940),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 16,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 16, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[6] = {
+	cpv(620.490490, -635.945990),
+	cpv(620.051250, -637.191390),
+	cpv(618.924700, -637.656470),
+	cpv(617.648290, -637.206890),
+	cpv(617.100520, -635.940830),
+	cpv(620.490490, -635.945990),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 6,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 6, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[8] = {
+	cpv(622.319840, -638.323110),
+	cpv(623.327530, -638.323110),
+	cpv(625.136210, -633.465520),
+	cpv(626.944880, -638.323110),
+	cpv(627.952570, -638.323110),
+	cpv(625.782160, -632.535350),
+	cpv(624.490250, -632.535350),
+	cpv(622.319840, -638.323110),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 8,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 8, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[16] = {
+	cpv(634.215750, -635.666940),
+	cpv(634.215750, -635.201850),
+	cpv(629.843930, -635.201850),
+	cpv(630.433040, -633.703220),
+	cpv(631.910990, -633.191630),
+	cpv(632.970350, -633.325980),
+	cpv(633.993550, -633.729070),
+	cpv(633.993550, -632.829890),
+	cpv(632.944520, -632.499160),
+	cpv(631.854140, -632.385490),
+	cpv(629.657890, -633.191630),
+	cpv(628.851740, -635.372370),
+	cpv(629.616550, -637.625460),
+	cpv(631.688780, -638.462630),
+	cpv(633.533630, -637.708140),
+	cpv(634.215750, -635.666940),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 16,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 16, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[6] = {
+	cpv(633.264910, -635.945990),
+	cpv(632.825660, -637.191390),
+	cpv(631.699110, -637.656470),
+	cpv(630.422710, -637.206890),
+	cpv(629.874930, -635.940830),
+	cpv(633.264910, -635.945990),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 6,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 6, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(594.983010, -625.093950),
+	cpv(595.933850, -625.093950),
+	cpv(595.933850, -619.306190),
+	cpv(594.983010, -619.306190),
+	cpv(594.983010, -625.093950),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(594.983010, -627.347030),
+	cpv(595.933850, -627.347030),
+	cpv(595.933850, -626.142970),
+	cpv(594.983010, -626.142970),
+	cpv(594.983010, -627.347030),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[17] = {
+	cpv(602.729310, -622.799510),
+	cpv(602.729310, -619.306190),
+	cpv(601.778460, -619.306190),
+	cpv(601.778460, -622.768500),
+	cpv(601.458060, -623.998390),
+	cpv(600.496880, -624.406640),
+	cpv(599.282490, -623.915700),
+	cpv(598.838070, -622.577280),
+	cpv(598.838070, -619.306190),
+	cpv(597.882060, -619.306190),
+	cpv(597.882060, -625.093950),
+	cpv(598.838070, -625.093950),
+	cpv(598.838070, -624.194760),
+	cpv(599.639050, -624.975070),
+	cpv(600.708760, -625.233460),
+	cpv(602.217710, -624.613360),
+	cpv(602.729310, -622.799510),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 17,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 17, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[15] = {
+	cpv(610.413590, -618.768740),
+	cpv(609.628110, -617.420000),
+	cpv(608.604920, -617.104750),
+	cpv(607.845270, -617.104750),
+	cpv(607.845270, -617.900590),
+	cpv(608.403380, -617.900590),
+	cpv(609.013160, -618.086620),
+	cpv(609.493750, -618.965110),
+	cpv(609.664280, -619.399190),
+	cpv(607.323340, -625.093950),
+	cpv(608.331030, -625.093950),
+	cpv(610.139710, -620.567090),
+	cpv(611.948380, -625.093950),
+	cpv(612.956070, -625.093950),
+	cpv(610.413590, -618.768740),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 15,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 15, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[9] = {
+	cpv(616.511410, -624.427300),
+	cpv(615.302180, -623.827860),
+	cpv(614.857760, -622.194880),
+	cpv(615.297010, -620.556740),
+	cpv(616.511410, -619.962460),
+	cpv(617.715470, -620.561930),
+	cpv(618.159890, -622.194880),
+	cpv(617.715470, -623.822700),
+	cpv(616.511410, -624.427300),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 9,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 9, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[9] = {
+	cpv(616.511410, -625.233460),
+	cpv(618.459610, -624.427300),
+	cpv(619.167580, -622.194880),
+	cpv(618.459610, -619.962460),
+	cpv(616.511410, -619.156330),
+	cpv(614.558040, -619.962460),
+	cpv(613.855240, -622.194880),
+	cpv(614.558040, -624.427300),
+	cpv(616.511410, -625.233460),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 9,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 9, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[17] = {
+	cpv(620.640360, -621.590280),
+	cpv(620.640360, -625.093950),
+	cpv(621.591200, -625.093950),
+	cpv(621.591200, -621.626450),
+	cpv(621.911600, -620.391380),
+	cpv(622.872780, -619.983150),
+	cpv(624.087170, -620.474060),
+	cpv(624.536760, -621.812480),
+	cpv(624.536760, -625.093950),
+	cpv(625.487600, -625.093950),
+	cpv(625.487600, -619.306190),
+	cpv(624.536760, -619.306190),
+	cpv(624.536760, -620.195000),
+	cpv(623.730610, -619.409530),
+	cpv(622.671240, -619.156330),
+	cpv(621.157120, -619.776430),
+	cpv(620.640360, -621.590280),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 17,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 17, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(628.055920, -620.618760),
+	cpv(629.104960, -620.618760),
+	cpv(629.104960, -619.306190),
+	cpv(628.055920, -619.306190),
+	cpv(628.055920, -620.618760),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[7] = {
+	cpv(628.055920, -627.021460),
+	cpv(629.104960, -627.021460),
+	cpv(629.104960, -623.636650),
+	cpv(629.001600, -621.791820),
+	cpv(628.164440, -621.791820),
+	cpv(628.055920, -623.636650),
+	cpv(628.055920, -627.021460),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 7,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 7, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(477.076100, -886.610990),
+	cpv(490.920660, -878.753260),
+	cpv(495.784980, -892.597820),
+	cpv(486.430530, -903.823140),
+	cpv(477.076100, -886.610990),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(408.227470, -916.545180),
+	cpv(410.098370, -897.087930),
+	cpv(429.181410, -897.087930),
+	cpv(430.678110, -922.157840),
+	cpv(408.227470, -916.545180),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(446.019390, -965.562390),
+	cpv(446.393560, -950.595310),
+	cpv(469.966720, -953.962900),
+	cpv(469.966720, -970.800870),
+	cpv(446.019390, -965.562390),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(404.485710, -999.612540),
+	cpv(397.376330, -980.155320),
+	cpv(408.601650, -967.807460),
+	cpv(409.349990, -990.632270),
+	cpv(404.485710, -999.612540),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(187.837020, -1316.166500),
+	cpv(188.585370, -1236.841000),
+	cpv(624.127790, -1247.317900),
+	cpv(624.127790, -1321.405000),
+	cpv(187.837020, -1316.166500),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[10] = {
+	cpv(368.617780, -1148.107300),
+	cpv(372.678860, -1148.107300),
+	cpv(375.958590, -1142.975400),
+	cpv(379.238320, -1148.107300),
+	cpv(383.309040, -1148.107300),
+	cpv(377.820320, -1139.772900),
+	cpv(377.820320, -1133.705400),
+	cpv(374.106510, -1133.705400),
+	cpv(374.106510, -1139.772900),
+	cpv(368.617780, -1148.107300),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 10,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 10, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[9] = {
+	cpv(388.112890, -1142.300200),
+	cpv(386.357270, -1141.470600),
+	cpv(385.759200, -1139.097700),
+	cpv(386.357270, -1136.715000),
+	cpv(388.112890, -1135.895100),
+	cpv(389.839570, -1136.715000),
+	cpv(390.437640, -1139.097700),
+	cpv(389.839570, -1141.470600),
+	cpv(388.112890, -1142.300200),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 9,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 9, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[9] = {
+	cpv(388.112890, -1144.769700),
+	cpv(392.463350, -1143.264800),
+	cpv(394.035690, -1139.097700),
+	cpv(392.463350, -1134.930500),
+	cpv(388.112890, -1133.425600),
+	cpv(383.733480, -1134.930500),
+	cpv(382.161140, -1139.097700),
+	cpv(383.733480, -1143.264800),
+	cpv(388.112890, -1144.769700),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 9,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 9, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[22] = {
+	cpv(396.437610, -1137.911200),
+	cpv(396.437610, -1144.509200),
+	cpv(399.910270, -1144.509200),
+	cpv(399.910270, -1143.428800),
+	cpv(399.900270, -1141.219800),
+	cpv(399.890270, -1139.454600),
+	cpv(399.957770, -1137.573500),
+	cpv(400.189280, -1136.744000),
+	cpv(400.739110, -1136.223100),
+	cpv(401.530110, -1136.039800),
+	cpv(403.227850, -1136.869400),
+	cpv(403.845210, -1139.174800),
+	cpv(403.845210, -1144.509200),
+	cpv(407.298570, -1144.509200),
+	cpv(407.298570, -1133.705400),
+	cpv(403.845210, -1133.705400),
+	cpv(403.845210, -1135.268100),
+	cpv(402.186050, -1133.869400),
+	cpv(400.266450, -1133.425600),
+	cpv(397.411150, -1134.573500),
+	cpv(396.436880, -1137.911200),
+	cpv(396.437610, -1137.911200),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 22,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 22, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[14] = {
+	cpv(424.855520, -1142.927200),
+	cpv(424.855520, -1148.715000),
+	cpv(428.328170, -1148.715000),
+	cpv(428.328170, -1133.705400),
+	cpv(424.855520, -1133.705400),
+	cpv(424.855520, -1135.268100),
+	cpv(423.283170, -1133.869400),
+	cpv(421.296040, -1133.425600),
+	cpv(418.016310, -1135.007600),
+	cpv(416.733360, -1139.097700),
+	cpv(418.016310, -1143.178000),
+	cpv(421.296040, -1144.769700),
+	cpv(423.273530, -1144.316300),
+	cpv(424.855520, -1142.927200),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 14,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 14, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[9] = {
+	cpv(422.579000, -1135.933700),
+	cpv(424.267090, -1136.744000),
+	cpv(424.855520, -1139.097700),
+	cpv(424.267090, -1141.451300),
+	cpv(422.579000, -1142.261600),
+	cpv(420.890900, -1141.451300),
+	cpv(420.312130, -1139.097700),
+	cpv(420.890900, -1136.744000),
+	cpv(422.579000, -1135.933700),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 9,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 9, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(431.665780, -1144.509200),
+	cpv(435.119140, -1144.509200),
+	cpv(435.119140, -1133.705400),
+	cpv(431.665780, -1133.705400),
+	cpv(431.665780, -1144.509200),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(431.665780, -1148.715000),
+	cpv(435.119140, -1148.715000),
+	cpv(435.119140, -1145.898300),
+	cpv(431.665780, -1145.898300),
+	cpv(431.665780, -1148.715000),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[14] = {
+	cpv(445.807210, -1142.927200),
+	cpv(445.807210, -1148.715000),
+	cpv(449.279860, -1148.715000),
+	cpv(449.279860, -1133.705400),
+	cpv(445.807210, -1133.705400),
+	cpv(445.807210, -1135.268100),
+	cpv(444.234860, -1133.869400),
+	cpv(442.247730, -1133.425600),
+	cpv(438.968000, -1135.007600),
+	cpv(437.685050, -1139.097700),
+	cpv(438.968000, -1143.178000),
+	cpv(442.247730, -1144.769700),
+	cpv(444.225220, -1144.316300),
+	cpv(445.807210, -1142.927200),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 14,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 14, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[9] = {
+	cpv(443.530690, -1135.933700),
+	cpv(445.218780, -1136.744000),
+	cpv(445.807210, -1139.097700),
+	cpv(445.218780, -1141.451300),
+	cpv(443.530690, -1142.261600),
+	cpv(441.842590, -1141.451300),
+	cpv(441.263810, -1139.097700),
+	cpv(441.842590, -1136.744000),
+	cpv(443.530690, -1135.933700),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 9,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 9, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(459.485620, -1144.509200),
+	cpv(462.938980, -1144.509200),
+	cpv(462.938980, -1133.705400),
+	cpv(459.485620, -1133.705400),
+	cpv(459.485620, -1144.509200),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(459.485620, -1148.715000),
+	cpv(462.938980, -1148.715000),
+	cpv(462.938980, -1145.898300),
+	cpv(459.485620, -1145.898300),
+	cpv(459.485620, -1148.715000),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[19] = {
+	cpv(470.048280, -1147.576700),
+	cpv(470.048280, -1144.509200),
+	cpv(473.607750, -1144.509200),
+	cpv(473.607750, -1142.039800),
+	cpv(470.048280, -1142.039800),
+	cpv(470.048280, -1137.457800),
+	cpv(470.347310, -1136.435300),
+	cpv(471.533800, -1136.174800),
+	cpv(473.308710, -1136.174800),
+	cpv(473.308710, -1133.705400),
+	cpv(470.347310, -1133.705400),
+	cpv(467.443790, -1134.554300),
+	cpv(466.594910, -1137.457800),
+	cpv(466.594910, -1142.039800),
+	cpv(464.877880, -1142.039800),
+	cpv(464.877880, -1144.509200),
+	cpv(466.594910, -1144.509200),
+	cpv(466.594910, -1147.576700),
+	cpv(470.048280, -1147.576700),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 19,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 19, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[7] = {
+	cpv(476.839250, -1148.107300),
+	cpv(480.311900, -1148.107300),
+	cpv(480.311900, -1142.580000),
+	cpv(479.819940, -1138.547800),
+	cpv(477.331210, -1138.547800),
+	cpv(476.839250, -1142.580000),
+	cpv(476.839250, -1148.107300),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 7,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 7, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(476.839250, -1137.139500),
+	cpv(480.311900, -1137.139500),
+	cpv(480.311900, -1133.705400),
+	cpv(476.839250, -1133.705400),
+	cpv(476.839250, -1137.139500),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(503.194380, -670.660740),
+	cpv(469.370830, -621.795830),
+	cpv(473.604160, -612.270830),
+	cpv(506.941660, -660.954160),
+	cpv(503.194380, -670.660740),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[11] = {
+	cpv(263.340150, -181.509126),
+	cpv(264.745750, -181.509126),
+	cpv(268.166730, -175.054740),
+	cpv(268.166730, -181.509126),
+	cpv(269.179590, -181.509126),
+	cpv(269.179590, -173.793834),
+	cpv(267.773990, -173.793834),
+	cpv(264.353010, -180.248223),
+	cpv(264.353010, -173.793834),
+	cpv(263.340150, -173.793834),
+	cpv(263.340150, -181.509126),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 11,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 11, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(271.215640, -179.581594),
+	cpv(272.166480, -179.581594),
+	cpv(272.166480, -173.793834),
+	cpv(271.215640, -173.793834),
+	cpv(271.215640, -179.581594),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(271.215640, -181.834688),
+	cpv(272.166480, -181.834688),
+	cpv(272.166480, -180.630628),
+	cpv(271.215640, -180.630628),
+	cpv(271.215640, -181.834688),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[20] = {
+	cpv(278.315980, -179.359387),
+	cpv(278.315980, -178.470553),
+	cpv(277.504660, -178.801283),
+	cpv(276.688170, -178.914969),
+	cpv(275.251570, -178.325858),
+	cpv(274.739970, -176.682547),
+	cpv(275.251570, -175.034068),
+	cpv(276.688170, -174.450125),
+	cpv(277.504660, -174.558646),
+	cpv(278.315980, -174.894543),
+	cpv(278.315980, -174.016044),
+	cpv(277.489160, -173.736991),
+	cpv(276.584820, -173.643971),
+	cpv(274.507430, -174.465627),
+	cpv(273.737450, -176.682544),
+	cpv(274.512590, -178.909798),
+	cpv(276.646830, -179.721119),
+	cpv(277.504660, -179.628099),
+	cpv(278.315980, -179.359381),
+	cpv(278.315980, -179.359387),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 20,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 20, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[16] = {
+	cpv(284.930560, -176.925426),
+	cpv(284.930560, -176.460339),
+	cpv(280.558740, -176.460339),
+	cpv(281.147850, -174.961723),
+	cpv(282.625790, -174.450125),
+	cpv(283.685160, -174.584486),
+	cpv(284.708350, -174.987560),
+	cpv(284.708350, -174.088392),
+	cpv(283.659320, -173.757663),
+	cpv(282.568950, -173.643974),
+	cpv(280.372700, -174.450125),
+	cpv(279.566550, -176.630871),
+	cpv(280.331360, -178.883965),
+	cpv(282.403590, -179.721122),
+	cpv(284.248430, -178.966647),
+	cpv(284.930560, -176.925426),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 16,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 16, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[6] = {
+	cpv(283.979720, -177.204480),
+	cpv(283.540470, -178.449881),
+	cpv(282.413920, -178.914969),
+	cpv(281.137510, -178.465383),
+	cpv(280.589740, -177.199312),
+	cpv(283.979720, -177.204480),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 6,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 6, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[11] = {
+	cpv(264.714740, -166.352428),
+	cpv(265.665590, -166.352428),
+	cpv(265.665590, -160.461316),
+	cpv(265.241840, -158.859346),
+	cpv(263.887920, -158.363252),
+	cpv(263.526180, -158.363252),
+	cpv(263.526180, -159.169406),
+	cpv(263.779400, -159.169406),
+	cpv(264.518370, -159.422620),
+	cpv(264.714740, -160.461316),
+	cpv(264.714740, -166.352428),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 11,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 11, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(264.714740, -168.605522),
+	cpv(265.665590, -168.605522),
+	cpv(265.665590, -167.401461),
+	cpv(264.714740, -167.401461),
+	cpv(264.714740, -168.605522),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[9] = {
+	cpv(269.892720, -165.685802),
+	cpv(268.683490, -165.086357),
+	cpv(268.239070, -163.453380),
+	cpv(268.678330, -161.815239),
+	cpv(269.892720, -161.220958),
+	cpv(271.096780, -161.820406),
+	cpv(271.541200, -163.453380),
+	cpv(271.096780, -165.081190),
+	cpv(269.892720, -165.685802),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 9,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 9, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[9] = {
+	cpv(269.892720, -166.491956),
+	cpv(271.840920, -165.685802),
+	cpv(272.548890, -163.453380),
+	cpv(271.840920, -161.220958),
+	cpv(269.892720, -160.414807),
+	cpv(267.939350, -161.220958),
+	cpv(267.236550, -163.453380),
+	cpv(267.939350, -165.685802),
+	cpv(269.892720, -166.491956),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 9,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 9, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[9] = {
+	cpv(278.274640, -163.453380),
+	cpv(277.840560, -165.096692),
+	cpv(276.657170, -165.696139),
+	cpv(275.468610, -165.096692),
+	cpv(275.039690, -163.453380),
+	cpv(275.468610, -161.804902),
+	cpv(276.657170, -161.210624),
+	cpv(277.840560, -161.804902),
+	cpv(278.274640, -163.453380),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 9,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 9, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[14] = {
+	cpv(275.039690, -165.473929),
+	cpv(275.794170, -166.238742),
+	cpv(276.889710, -166.491956),
+	cpv(278.600200, -165.654798),
+	cpv(279.261660, -163.453380),
+	cpv(278.600200, -161.251965),
+	cpv(276.889710, -160.414807),
+	cpv(275.794170, -160.662854),
+	cpv(275.039690, -161.432832),
+	cpv(275.039690, -160.564667),
+	cpv(274.083680, -160.564667),
+	cpv(274.083680, -168.605522),
+	cpv(275.039690, -168.605522),
+	cpv(275.039690, -165.473929),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 14,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 14, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(281.437230, -161.877250),
+	cpv(282.486270, -161.877250),
+	cpv(282.486270, -160.564667),
+	cpv(281.437230, -160.564667),
+	cpv(281.437230, -161.877250),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[7] = {
+	cpv(281.437230, -168.279960),
+	cpv(282.486270, -168.279960),
+	cpv(282.486270, -164.895153),
+	cpv(282.382910, -163.050306),
+	cpv(281.545760, -163.050306),
+	cpv(281.437230, -164.895153),
+	cpv(281.437230, -168.279960),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 7,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 7, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[19] = {
+	cpv(279.977740, -783.904610),
+	cpv(279.977740, -782.261280),
+	cpv(281.936280, -782.261280),
+	cpv(281.936280, -781.522320),
+	cpv(279.977740, -781.522320),
+	cpv(279.977740, -778.380400),
+	cpv(280.168940, -777.470890),
+	cpv(280.959590, -777.269330),
+	cpv(281.936280, -777.269330),
+	cpv(281.936280, -776.473520),
+	cpv(280.959590, -776.473520),
+	cpv(279.440300, -776.881770),
+	cpv(279.021720, -778.380400),
+	cpv(279.021720, -781.522320),
+	cpv(278.324090, -781.522320),
+	cpv(278.324090, -782.261280),
+	cpv(279.021720, -782.261280),
+	cpv(279.021720, -783.904610),
+	cpv(279.977740, -783.904610),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 19,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 19, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[14] = {
+	cpv(282.639080, -782.261280),
+	cpv(283.589920, -782.261280),
+	cpv(284.778480, -777.744760),
+	cpv(285.961870, -782.261280),
+	cpv(287.083250, -782.261280),
+	cpv(288.271810, -777.744760),
+	cpv(289.455200, -782.261280),
+	cpv(290.406040, -782.261280),
+	cpv(288.891920, -776.473520),
+	cpv(287.770550, -776.473520),
+	cpv(286.525140, -781.217420),
+	cpv(285.274570, -776.473520),
+	cpv(284.153190, -776.473520),
+	cpv(282.639080, -782.261280),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 14,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 14, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(291.852980, -782.261280),
+	cpv(292.803830, -782.261280),
+	cpv(292.803830, -776.473520),
+	cpv(291.852980, -776.473520),
+	cpv(291.852980, -782.261280),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(291.852980, -784.514390),
+	cpv(292.803830, -784.514390),
+	cpv(292.803830, -783.310330),
+	cpv(291.852980, -783.310330),
+	cpv(291.852980, -784.514390),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[19] = {
+	cpv(295.728710, -783.904610),
+	cpv(295.728710, -782.261280),
+	cpv(297.687250, -782.261280),
+	cpv(297.687250, -781.522320),
+	cpv(295.728710, -781.522320),
+	cpv(295.728710, -778.380400),
+	cpv(295.919920, -777.470890),
+	cpv(296.710570, -777.269330),
+	cpv(297.687250, -777.269330),
+	cpv(297.687250, -776.473520),
+	cpv(296.710570, -776.473520),
+	cpv(295.191280, -776.881770),
+	cpv(294.772700, -778.380400),
+	cpv(294.772700, -781.522320),
+	cpv(294.075070, -781.522320),
+	cpv(294.075070, -782.261280),
+	cpv(294.772700, -782.261280),
+	cpv(294.772700, -783.904610),
+	cpv(295.728710, -783.904610),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 19,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 19, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[20] = {
+	cpv(303.108110, -782.039080),
+	cpv(303.108110, -781.150240),
+	cpv(302.296790, -781.480970),
+	cpv(301.480300, -781.594660),
+	cpv(300.043700, -781.005540),
+	cpv(299.532100, -779.362240),
+	cpv(300.043700, -777.713750),
+	cpv(301.480300, -777.129820),
+	cpv(302.296790, -777.238350),
+	cpv(303.108110, -777.574240),
+	cpv(303.108110, -776.695740),
+	cpv(302.281290, -776.416690),
+	cpv(301.376950, -776.323690),
+	cpv(299.299560, -777.145350),
+	cpv(298.529580, -779.362270),
+	cpv(299.304730, -781.589530),
+	cpv(301.438960, -782.400850),
+	cpv(302.296790, -782.307850),
+	cpv(303.108110, -782.039140),
+	cpv(303.108110, -782.039080),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 20,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 20, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[17] = {
+	cpv(309.583170, -779.966870),
+	cpv(309.583170, -776.473520),
+	cpv(308.632320, -776.473520),
+	cpv(308.632320, -779.935860),
+	cpv(308.311930, -781.165750),
+	cpv(307.350740, -781.574000),
+	cpv(306.136350, -781.083060),
+	cpv(305.691930, -779.744640),
+	cpv(305.691930, -776.473520),
+	cpv(304.735920, -776.473520),
+	cpv(304.735920, -784.514390),
+	cpv(305.691930, -784.514390),
+	cpv(305.691930, -781.362120),
+	cpv(306.492920, -782.142430),
+	cpv(307.562620, -782.400820),
+	cpv(309.071570, -781.780690),
+	cpv(309.583170, -779.966870),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 17,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 17, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(311.624390, -777.786120),
+	cpv(312.714760, -777.786120),
+	cpv(312.714760, -776.473520),
+	cpv(311.624390, -776.473520),
+	cpv(311.624390, -777.786120),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[19] = {
+	cpv(315.799840, -783.904610),
+	cpv(315.799840, -782.261280),
+	cpv(317.758390, -782.261280),
+	cpv(317.758390, -781.522320),
+	cpv(315.799840, -781.522320),
+	cpv(315.799840, -778.380400),
+	cpv(315.991050, -777.470890),
+	cpv(316.781710, -777.269330),
+	cpv(317.758390, -777.269330),
+	cpv(317.758390, -776.473520),
+	cpv(316.781710, -776.473520),
+	cpv(315.262420, -776.881770),
+	cpv(314.843820, -778.380400),
+	cpv(314.843820, -781.522320),
+	cpv(314.146190, -781.522320),
+	cpv(314.146190, -782.261280),
+	cpv(314.843820, -782.261280),
+	cpv(314.843820, -783.904610),
+	cpv(315.799840, -783.904610),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 19,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 19, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[8] = {
+	cpv(318.331980, -782.261280),
+	cpv(319.339670, -782.261280),
+	cpv(321.148360, -777.403710),
+	cpv(322.957030, -782.261280),
+	cpv(323.964720, -782.261280),
+	cpv(321.794320, -776.473520),
+	cpv(320.502410, -776.473520),
+	cpv(318.331980, -782.261280),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 8,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 8, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
+	cpv(326.967130, -784.188820),
+	cpv(327.845630, -784.188820),
+	cpv(325.158440, -775.491680),
+	cpv(324.279940, -775.491680),
+	cpv(326.967130, -784.188820),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[11] = {
+	cpv(277.042520, -770.959650),
+	cpv(281.476360, -770.959650),
+	cpv(281.476360, -770.081160),
+	cpv(278.086380, -770.081160),
+	cpv(278.086380, -767.807380),
+	cpv(281.145630, -767.807380),
+	cpv(281.145630, -766.928890),
+	cpv(278.086380, -766.928890),
+	cpv(278.086380, -763.244350),
+	cpv(277.042520, -763.244350),
+	cpv(277.042520, -770.959650),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 11,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 11, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[17] = {
+	cpv(282.422030, -765.528450),
+	cpv(282.422030, -769.032110),
+	cpv(283.372880, -769.032110),
+	cpv(283.372880, -765.564640),
+	cpv(283.693270, -764.329570),
+	cpv(284.654460, -763.921310),
+	cpv(285.868850, -764.412250),
+	cpv(286.318440, -765.750670),
+	cpv(286.318440, -769.032110),
+	cpv(287.269280, -769.032110),
+	cpv(287.269280, -763.244350),
+	cpv(286.318440, -763.244350),
+	cpv(286.318440, -764.133190),
+	cpv(285.512280, -763.347720),
+	cpv(284.452920, -763.094490),
+	cpv(282.938800, -763.714620),
+	cpv(282.422030, -765.528450),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 17,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 17, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[11] = {
+	cpv(288.824740, -769.032110),
+	cpv(293.341270, -769.032110),
+	cpv(293.341270, -768.163960),
+	cpv(289.765260, -764.004000),
+	cpv(293.341270, -764.004000),
+	cpv(293.341270, -763.244350),
+	cpv(288.695550, -763.244350),
+	cpv(288.695550, -764.112530),
+	cpv(292.271560, -768.272470),
+	cpv(288.824740, -768.272470),
+	cpv(288.824740, -769.032110),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 11,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 11, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[11] = {
+	cpv(294.385130, -769.032110),
+	cpv(298.901650, -769.032110),
+	cpv(298.901650, -768.163960),
+	cpv(295.325640, -764.004000),
+	cpv(298.901650, -764.004000),
+	cpv(298.901650, -763.244350),
+	cpv(294.255940, -763.244350),
+	cpv(294.255940, -764.112530),
+	cpv(297.831950, -768.272470),
+	cpv(294.385130, -768.272470),
+	cpv(294.385130, -769.032110),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 11,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 11, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[15] = {
+	cpv(302.767050, -762.706930),
+	cpv(301.981570, -761.358160),
+	cpv(300.958370, -761.042940),
+	cpv(300.198730, -761.042940),
+	cpv(300.198730, -761.838750),
+	cpv(300.756830, -761.838750),
+	cpv(301.366620, -762.024810),
+	cpv(301.847200, -762.903300),
+	cpv(302.017740, -763.337380),
+	cpv(299.676800, -769.032110),
+	cpv(300.684490, -769.032110),
+	cpv(302.493160, -764.505280),
+	cpv(304.301840, -769.032110),
+	cpv(305.309530, -769.032110),
+	cpv(302.767050, -762.706930),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 15,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 15, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[17] = {
+	cpv(311.433180, -766.737700),
+	cpv(311.433180, -763.244350),
+	cpv(310.482340, -763.244350),
+	cpv(310.482340, -766.706690),
+	cpv(310.161940, -767.936580),
+	cpv(309.200760, -768.344830),
+	cpv(307.986370, -767.853900),
+	cpv(307.541950, -766.515480),
+	cpv(307.541950, -763.244350),
+	cpv(306.585930, -763.244350),
+	cpv(306.585930, -769.032110),
+	cpv(307.541950, -769.032110),
+	cpv(307.541950, -768.132950),
+	cpv(308.342930, -768.913260),
+	cpv(309.412630, -769.171650),
+	cpv(310.921590, -768.551520),
+	cpv(311.433180, -766.737700),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 17,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 17, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[16] = {
+	cpv(318.290650, -766.375960),
+	cpv(318.290650, -765.910880),
+	cpv(313.918810, -765.910880),
+	cpv(314.507930, -764.412250),
+	cpv(315.985870, -763.900650),
+	cpv(317.045230, -764.035010),
+	cpv(318.068430, -764.438070),
+	cpv(318.068430, -763.538910),
+	cpv(317.019410, -763.208180),
+	cpv(315.929030, -763.094490),
+	cpv(313.732780, -763.900650),
+	cpv(312.926630, -766.081400),
+	cpv(313.691450, -768.334490),
+	cpv(315.763670, -769.171650),
+	cpv(317.608530, -768.417170),
+	cpv(318.290650, -766.375960),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 16,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 16, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[6] = {
+	cpv(317.339790, -766.655020),
+	cpv(316.900560, -767.900410),
+	cpv(315.774010, -768.365490),
+	cpv(314.497580, -767.915910),
+	cpv(313.949820, -766.649830),
+	cpv(317.339790, -766.655020),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 6,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 6, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[30] = {
+	cpv(323.540960, -768.861590),
+	cpv(323.540960, -767.962430),
+	cpv(322.703820, -768.272470),
+	cpv(321.804640, -768.375840),
+	cpv(320.740110, -768.158780),
+	cpv(320.388720, -767.507660),
+	cpv(320.641920, -766.985750),
+	cpv(321.659960, -766.629170),
+	cpv(321.985500, -766.556870),
+	cpv(323.422110, -765.941900),
+	cpv(323.851030, -764.841210),
+	cpv(323.210230, -763.564800),
+	cpv(321.458400, -763.094530),
+	cpv(320.486900, -763.187530),
+	cpv(319.427540, -763.456240),
+	cpv(319.427540, -764.438080),
+	cpv(320.466210, -764.024670),
+	cpv(321.479090, -763.890320),
+	cpv(322.512610, -764.117700),
+	cpv(322.874350, -764.768810),
+	cpv(322.610790, -765.363090),
+	cpv(321.468750, -765.761000),
+	cpv(321.138020, -765.838500),
+	cpv(319.861610, -766.406960),
+	cpv(319.468870, -767.466320),
+	cpv(320.047640, -768.727220),
+	cpv(321.690940, -769.171640),
+	cpv(322.683130, -769.094140),
+	cpv(323.540960, -768.861600),
+	cpv(323.540960, -768.861590),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 30,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 30, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[30] = {
+	cpv(329.060010, -768.861590),
+	cpv(329.060010, -767.962430),
+	cpv(328.222840, -768.272470),
+	cpv(327.323680, -768.375840),
+	cpv(326.259160, -768.158780),
+	cpv(325.907740, -767.507660),
+	cpv(326.160970, -766.985750),
+	cpv(327.178980, -766.629170),
+	cpv(327.504550, -766.556870),
+	cpv(328.941160, -765.941900),
+	cpv(329.370080, -764.841210),
+	cpv(328.729280, -763.564800),
+	cpv(326.977450, -763.094530),
+	cpv(326.005930, -763.187530),
+	cpv(324.946560, -763.456240),
+	cpv(324.946560, -764.438080),
+	cpv(325.985260, -764.024670),
+	cpv(326.998110, -763.890320),
+	cpv(328.031660, -764.117700),
+	cpv(328.393400, -764.768810),
+	cpv(328.129840, -765.363090),
+	cpv(326.987800, -765.761000),
+	cpv(326.657070, -765.838500),
+	cpv(325.380660, -766.406960),
+	cpv(324.987920, -767.466320),
+	cpv(325.566690, -768.727220),
+	cpv(327.209990, -769.171640),
+	cpv(328.202180, -769.094140),
+	cpv(329.060010, -768.861600),
+	cpv(329.060010, -768.861590),
+};
+static shape_user_data user_data = {
+	.verts = verts,
+	.nr_verts = 30,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 30, verts, cpTransformIdentity, 0);
 cpShapeSetElasticity(level, .2);
 cpShapeSetFriction(level, 1.);
 cpShapeSetCollisionType(level, 0);
