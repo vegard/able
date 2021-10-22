@@ -17,7 +17,11 @@ for path in doc.getElementsByTagName('path'):
     #    continue
 
     d = path.getAttribute('d')
-    commands = re.findall(r'[A-Za-z]|-?[0-9]+(?:\.[0-9]+)?', d)
+    #commands = re.findall(r'[A-Za-z]|-?[0-9]+(?:\.[0-9]+)?', d)
+    commands = []
+    for command in d.split():
+        for arg in command.split(','):
+            commands.append(arg)
 
     points = []
 
@@ -39,7 +43,7 @@ for path in doc.getElementsByTagName('path'):
     while i < n:
         if commands[i] == 'm':
             i = i + 1
-            while i < n and not re.match(r'^\w$', commands[i]):
+            while i < n and not re.match(r'^[A-Za-z]$', commands[i]):
                 # Move the current point to the coordinate x,y
                 nx = x + float(commands[i + 0])
                 ny = y + float(commands[i + 1])
@@ -48,7 +52,7 @@ for path in doc.getElementsByTagName('path'):
                 i += 2
         elif commands[i] == 'M':
             i = i + 1
-            while i < n and not re.match(r'^\w$', commands[i]):
+            while i < n and not re.match(r'^[A-Za-z]$', commands[i]):
                 # Move the current point to the relative coordinate x,y
                 x = float(commands[i + 0])
                 y = float(commands[i + 1])
@@ -56,13 +60,22 @@ for path in doc.getElementsByTagName('path'):
                 i += 2
         elif commands[i] == 'v':
             i = i + 1
-            while i < n and not re.match(r'^\w$', commands[i]):
+            while i < n and not re.match(r'^[A-Za-z]$', commands[i]):
                 # Draw a vertical line from the current point to the end
                 # point, which is specified by the current point shifted by
                 # dy along the y-axis and the current point's x coordinate
                 ny = y + float(commands[i + 0])
                 points.append((x, ny))
                 y = ny
+                i += 1
+        elif commands[i] == 'V':
+            i = i + 1
+            while i < n and not re.match(r'^[A-Za-z]$', commands[i]):
+                # Draw a vertical line from the current point to the end
+                # point, which is specified by the current point shifted by
+                # dy along the y-axis and the current point's x coordinate
+                y = float(commands[i + 0])
+                points.append((x, y))
                 i += 1
         elif commands[i] == 'H':
             # Draw a horizontal line from the current point to the
@@ -127,7 +140,8 @@ for path in doc.getElementsByTagName('path'):
         elif commands[i] in ['Z', 'z']:
             # Close the current subpath by connecting the last point of
             # the path with its initial point
-            points.append(points[0])
+            x, y = points[0]
+            points.append((x, y))
             if len(points) > 0:
                 polygons.append(points)
             points = []
@@ -145,10 +159,15 @@ for points in polygons:
     for x, y in points:
         print "\tcpv(%f, %f)," % (x, y - 97)
     print "};"
+    print "static shape_user_data user_data = {"
+    print "\t.verts = verts,"
+    print "\t.nr_verts = %u," % (len(points), )
+    print "};"
     print "cpShape *level = cpPolyShapeNew(staticBody, %u, verts, cpTransformIdentity, 0);" % (len(points), )
     print "cpShapeSetElasticity(level, .2);"
     print "cpShapeSetFriction(level, 1.);"
     print "cpShapeSetCollisionType(level, 0);"
     print "cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));"
+    print "cpShapeSetUserData(level, &user_data);"
     print "cpSpaceAddShape(space, level);"
     print "}"

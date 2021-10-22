@@ -18,7 +18,7 @@ static const cpFloat max_rope_length = 40.;
 
 static const cpFloat hook_velocity = 10.;
 
-static const cpFloat hook_stiffness = 30.;
+static const cpFloat hook_stiffness = 50.;
 static const cpFloat hook_damping = 5.;
 
 static const cpFloat reel_in_velocity = .5;
@@ -36,6 +36,11 @@ enum collision_categories {
 	CP_CATEGORY_CAMERA,
 };
 
+struct shape_user_data {
+	const cpVect *verts;
+	unsigned int nr_verts;
+};
+
 /* Runtime state */
 
 static SDL_Surface *surface;
@@ -43,7 +48,6 @@ static SDL_Surface *surface;
 static cpSpace *space;
 static cpBody *staticBody;
 static cpBody *ballBody;
-static cpBody *torsoBody;
 
 static cpBody *leftHookBody;
 static cpShape *leftHookShape;
@@ -116,21 +120,32 @@ static void init()
 		cpShapeSetFriction(ballShape, 1.);
 
 		cpSpaceAddConstraint(space, cpDampedRotarySpringNew(staticBody, ballBody, 0., 1000., 100.));
-		cpShapeSetFilter(ballShape, cpShapeFilterNew(1, CP_ALL_CATEGORIES, CP_ALL_CATEGORIES));
+		cpShapeSetFilter(ballShape, cpShapeFilterNew(1, 1 << CP_CATEGORY_PLAYER, CP_ALL_CATEGORIES));
 	}
 
+	auto new_ragdoll_part = [](float mass, cpVect pos, float hw, float hh,
+		cpBody *parent, cpVect parent_anchor, cpVect anchor, float min_rot, float max_rot,
+		unsigned int categories = 0)
 	{
-		torsoBody = cpSpaceAddBody(space, cpBodyNew(1., 1.));
-		cpBodySetPosition(torsoBody, cpv(160, 95));
+		cpFloat moment = cpMomentForBox(mass, 2 * hw, 2 * hh);
+		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
+		cpBodySetPosition(body, pos);
 
-		cpShape *torsoShape = cpBoxShapeNew2(torsoBody, cpBBNewForExtents(cpv(0, 0), 4., 10.), 0);
-		cpShapeSetFilter(torsoShape, cpShapeFilterNew(1, 1 << CP_CATEGORY_RAGDOLL, 1 << CP_CATEGORY_CAMERA));
+		cpShape *torsoShape = cpBoxShapeNew2(body, cpBBNewForExtents(cpv(0, 0), hw, hh), 0);
+		cpShapeSetFilter(torsoShape, cpShapeFilterNew(1, (1 << CP_CATEGORY_RAGDOLL) | categories, (1 << CP_CATEGORY_CAMERA) | (1 << CP_CATEGORY_LEVEL)));
 
-		cpSpaceAddConstraint(space, cpPivotJointNew2(ballBody, torsoBody, cpv(0, ball_radius), cpv(0, -10.)));
-		cpSpaceAddConstraint(space, cpRotaryLimitJointNew(ballBody, torsoBody, -.3, .3));
+		cpSpaceAddConstraint(space, cpPivotJointNew2(parent, body, parent_anchor, anchor));
+		cpSpaceAddConstraint(space, cpRotaryLimitJointNew(parent, body, min_rot, max_rot));
 
 		cpSpaceAddShape(space, torsoShape);
-	}
+		return body;
+	};
+
+	auto torso = new_ragdoll_part(1., cpv(160, 95), 8., 10., ballBody, cpv(0, ball_radius), cpv(0, -10.), -.3, .3);
+	auto leftUpperLeg = new_ragdoll_part(.5, cpv(160 - 5, 115), 3., 8., torso, cpv(-5, 10), cpv(0, -8), -.5, .5);
+	auto rightUpperLeg = new_ragdoll_part(.5, cpv(160 + 5, 115), 3., 8., torso, cpv(5, 10), cpv(0, -8), -.5, .5);
+	auto leftLowerLeg = new_ragdoll_part(.2, cpv(160 - 5, 123), 2.5, 6., leftUpperLeg, cpv(0, 8), cpv(0, -6), -.5, .5, 1 << CP_CATEGORY_PLAYER);
+	auto rightLowerLeg = new_ragdoll_part(.2, cpv(160 + 5, 123), 2.5, 6., rightUpperLeg, cpv(0, 8), cpv(0, -6), -.5, .5, 1 << CP_CATEGORY_PLAYER);
 
 	{
 		cpFloat mass = .1;
@@ -144,7 +159,7 @@ static void init()
 		cpShapeSetElasticity(leftHookShape, 0.);
 		cpShapeSetFriction(leftHookShape, 1.);
 		cpShapeSetCollisionType(leftHookShape, 1);
-		cpShapeSetFilter(leftHookShape, cpShapeFilterNew(1, CP_ALL_CATEGORIES, CP_ALL_CATEGORIES));
+		cpShapeSetFilter(leftHookShape, cpShapeFilterNew(1, 1 << CP_CATEGORY_PLAYER, CP_ALL_CATEGORIES));
 
 		rightHookBody = cpBodyNew(mass, moment);
 		cpBodySetPosition(rightHookBody, cpv(160 + ball_radius + hook_radius, 100));
@@ -153,7 +168,7 @@ static void init()
 		cpShapeSetElasticity(rightHookShape, 0.);
 		cpShapeSetFriction(rightHookShape, 1.);
 		cpShapeSetCollisionType(rightHookShape, 1);
-		cpShapeSetFilter(rightHookShape, cpShapeFilterNew(1, CP_ALL_CATEGORIES, CP_ALL_CATEGORIES));
+		cpShapeSetFilter(rightHookShape, cpShapeFilterNew(1, 1 << CP_CATEGORY_PLAYER, CP_ALL_CATEGORIES));
 	}
 
 	leftHookOutJoint = cpSlideJointNew(ballBody, leftHookBody, left_shoulder_offset, cpv(hook_radius, 0), 0., max_rope_length);
@@ -201,6 +216,43 @@ static void draw_sphere(cpVect pos, cpVect rot, float radius)
 		glVertex2f(radius * cos(a0), radius * sin(a0));
 		glVertex2f(radius * cos(a1), radius * sin(a1));
 	}
+	glEnd();
+
+	glPopMatrix();
+}
+
+static void drawPolyShapeBody(cpBody *body, cpShape *shape)
+{
+	struct shape_user_data *user_data = (struct shape_user_data *) cpShapeGetUserData(shape);
+
+	glPushMatrix();
+	cpVect pos = cpBodyGetPosition(body);
+	cpVect rot = cpBodyGetRotation(body);
+	glTranslatef(pos.x, pos.y, 0);
+	glRotatef(360. * atan2(rot.y, rot.x) / 2. / M_PI, 0, 0, 1);
+
+	glBegin(GL_LINES);
+
+	if (user_data && user_data->verts) {
+		int n = user_data->nr_verts;
+		for (int i = 0; i < n; ++i) {
+			cpVect u = user_data->verts[i];
+			cpVect v = user_data->verts[(i + 1) % n];
+
+			glVertex2f(u.x, u.y);
+			glVertex2f(v.x, v.y);
+		}
+	} else {
+		int n = cpPolyShapeGetCount(shape);
+		for (int i = 0; i < n; ++i) {
+			cpVect u = cpPolyShapeGetVert(shape, i);
+			cpVect v = cpPolyShapeGetVert(shape, (i + 1) % n);
+
+			glVertex2f(u.x, u.y);
+			glVertex2f(v.x, v.y);
+		}
+	}
+
 	glEnd();
 
 	glPopMatrix();
@@ -295,58 +347,21 @@ static void display()
 
 	glEnd();
 
-	cpSpaceBBQuery(space, cpBBNew(ball_pos.x - 160, ball_pos.y - 100, ball_pos.x + 160, ball_pos.y + 100), CP_SHAPE_FILTER_ALL, [](cpShape *shape, void *data) {
+	cpSpaceBBQuery(space, cpBBNew(ball_pos.x - 160, ball_pos.y - 100, ball_pos.x + 160, ball_pos.y + 100), cpShapeFilterNew(0, 1 << CP_CATEGORY_CAMERA, 1 << CP_CATEGORY_LEVEL), [](cpShape *shape, void *data) {
 		cpBody *body = cpShapeGetBody(shape);
-		if (body != cpSpaceGetStaticBody(space) && body != torsoBody)
+		if (body != cpSpaceGetStaticBody(space))
 			return;
 
-		glPushMatrix();
-		cpVect pos = cpBodyGetPosition(body);
-		cpVect rot = cpBodyGetRotation(body);
-		glTranslatef(pos.x, pos.y, 0);
-		glRotatef(360. * atan2(rot.y, rot.x) / 2. / M_PI, 0, 0, 1);
+		drawPolyShapeBody(body, shape);
 
-		glBegin(GL_LINES);
-
-		int n = cpPolyShapeGetCount(shape);
-		for (int i = 0; i < n; ++i) {
-			cpVect u = cpPolyShapeGetVert(shape, i);
-			cpVect v = cpPolyShapeGetVert(shape, (i + 1) % n);
-
-			glVertex2f(u.x, u.y);
-			glVertex2f(v.x, v.y);
-		}
-		glEnd();
-
-		glPopMatrix();
 	}, NULL);
 
 	glColor3f(1, 0, 0);
 
-	cpSpaceBBQuery(space, cpBBNew(ball_pos.x - 160, ball_pos.y - 100, ball_pos.x + 160, ball_pos.y + 100), cpShapeFilterNew(1, 1 << CP_CATEGORY_CAMERA, 1 << CP_CATEGORY_RAGDOLL), [](cpShape *shape, void *data) {
+	cpSpaceBBQuery(space, cpBBNew(ball_pos.x - 160, ball_pos.y - 100, ball_pos.x + 160, ball_pos.y + 100), cpShapeFilterNew(2, 1 << CP_CATEGORY_CAMERA, 1 << CP_CATEGORY_RAGDOLL), [](cpShape *shape, void *data) {
 		cpBody *body = cpShapeGetBody(shape);
-		if (body != torsoBody)
-			return;
 
-		glPushMatrix();
-		cpVect pos = cpBodyGetPosition(body);
-		cpVect rot = cpBodyGetRotation(body);
-		glTranslatef(pos.x, pos.y, 0);
-		glRotatef(360. * atan2(rot.y, rot.x) / 2. / M_PI, 0, 0, 1);
-
-		glBegin(GL_LINES);
-
-		int n = cpPolyShapeGetCount(shape);
-		for (int i = 0; i < n; ++i) {
-			cpVect u = cpPolyShapeGetVert(shape, i);
-			cpVect v = cpPolyShapeGetVert(shape, (i + 1) % n);
-
-			glVertex2f(u.x, u.y);
-			glVertex2f(v.x, v.y);
-		}
-		glEnd();
-
-		glPopMatrix();
+		drawPolyShapeBody(body, shape);
 	}, NULL);
 
 	SDL_GL_SwapBuffers();
