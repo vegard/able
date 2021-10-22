@@ -1,5 +1,5 @@
 #include <cassert>
-#include <initializer_list>
+#include <vector>
 
 extern "C" {
 #include <SDL.h>
@@ -38,6 +38,8 @@ enum collision_categories {
 };
 
 struct shape_user_data {
+	float color[3];
+	bool filled;
 	const cpVect *verts;
 	unsigned int nr_verts;
 };
@@ -54,6 +56,8 @@ static cpBody *leftUpperLeg;
 static cpBody *rightUpperLeg;
 static cpBody *leftLowerLeg;
 static cpBody *rightLowerLeg;
+
+static std::vector<cpShape *> player_shapes;
 
 static cpBody *leftHookBody;
 static cpShape *leftHookShape;
@@ -80,6 +84,10 @@ static void init()
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glEnable(GL_POLYGON_SMOOTH);
+
+	glEnable(GL_MULTISAMPLE);
 
 	glClearColor(0, 0, 0, 0);
 	glClearDepth(1.0f);
@@ -137,13 +145,15 @@ static void init()
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
 		cpBodySetPosition(body, pos);
 
-		cpShape *torsoShape = cpBoxShapeNew2(body, cpBBNewForExtents(cpv(0, 0), hw, hh), 0);
-		cpShapeSetFilter(torsoShape, cpShapeFilterNew(1, (1 << CP_CATEGORY_RAGDOLL) | categories, (1 << CP_CATEGORY_CAMERA) | (1 << CP_CATEGORY_LEVEL)));
+		cpShape *shape = cpBoxShapeNew2(body, cpBBNewForExtents(cpv(0, 0), hw, hh), 0);
+		cpShapeSetFilter(shape, cpShapeFilterNew(1, (1 << CP_CATEGORY_RAGDOLL) | categories, (1 << CP_CATEGORY_CAMERA) | (1 << CP_CATEGORY_LEVEL)));
 
 		cpSpaceAddConstraint(space, cpPivotJointNew2(parent, body, parent_anchor, anchor));
 		cpSpaceAddConstraint(space, cpRotaryLimitJointNew(parent, body, min_rot, max_rot));
 
-		cpSpaceAddShape(space, torsoShape);
+		cpSpaceAddShape(space, shape);
+
+		player_shapes.push_back(shape);
 		return body;
 	};
 
@@ -211,11 +221,11 @@ static void draw_sphere(cpVect pos, cpVect rot, float radius)
 	glTranslatef(pos.x, pos.y, 0);
 	glRotatef(360. * atan2(rot.y, rot.x) / 2. / M_PI, 0, 0, 1);
 
-	glColor4f(0, 0, 0, 1);
+	//glColor4f(0, 0, 0, 1);
 	glBegin(GL_LINES);
 	unsigned int n = 20;
-	glVertex2f(0, 0);
-	glVertex2f(0, -radius);
+	//glVertex2f(0, 0);
+	//glVertex2f(0, -radius);
 	for (unsigned int i = 0; i < n; ++i) {
 		float a0 = 1. * i / n * (2. * M_PI);
 		float a1 = 1. * (i + 1) / n * (2. * M_PI);
@@ -237,19 +247,55 @@ static void drawPolyShapeBody(cpBody *body, cpShape *shape)
 	glTranslatef(pos.x, pos.y, 0);
 	glRotatef(360. * atan2(rot.y, rot.x) / 2. / M_PI, 0, 0, 1);
 
-	glBegin(GL_LINES);
-
 	if (user_data && user_data->verts) {
 		int n = user_data->nr_verts;
-		for (int i = 0; i < n; ++i) {
-			cpVect u = user_data->verts[i];
-			cpVect v = user_data->verts[(i + 1) % n];
 
-			glVertex2f(u.x, u.y);
-			glVertex2f(v.x, v.y);
+		glColor3f(user_data->color[0] / 255., user_data->color[1] / 255., user_data->color[2] / 255.);
+
+		if (user_data->filled) {
+			if (n == 4)
+				glBegin(GL_TRIANGLES);
+			else if (n == 5)
+				glBegin(GL_QUADS);
+			else
+				assert(false);
+
+			for (int i = 0; i < n - 1; ++i) {
+				cpVect u = user_data->verts[i];
+				glVertex2f(u.x, u.y);
+			}
+
+			glEnd();
+		} else {
+			glBegin(GL_LINES);
+
+			for (int i = 0; i < n; ++i) {
+				cpVect u = user_data->verts[i];
+				cpVect v = user_data->verts[(i + 1) % n];
+
+				glVertex2f(u.x, u.y);
+				glVertex2f(v.x, v.y);
+			}
+
+			glEnd();
 		}
 	} else {
 		int n = cpPolyShapeGetCount(shape);
+		if (n == 4) {
+			glColor3f(1, 1, 1);
+			glBegin(GL_QUADS);
+
+			for (int i = 0; i < n; ++i) {
+				cpVect u = cpPolyShapeGetVert(shape, i);
+				glVertex2f(u.x, u.y);
+			}
+
+			glEnd();
+		}
+
+		glColor3f(0, 0, 0);
+		glBegin(GL_LINES);
+
 		for (int i = 0; i < n; ++i) {
 			cpVect u = cpPolyShapeGetVert(shape, i);
 			cpVect v = cpPolyShapeGetVert(shape, (i + 1) % n);
@@ -257,9 +303,9 @@ static void drawPolyShapeBody(cpBody *body, cpShape *shape)
 			glVertex2f(u.x, u.y);
 			glVertex2f(v.x, v.y);
 		}
-	}
 
-	glEnd();
+		glEnd();
+	}
 
 	glPopMatrix();
 }
@@ -274,9 +320,38 @@ static void display()
 
 	cpVect ball_pos = cpBodyGetPosition(ballBody);
 
-	draw_sphere(ball_pos, cpBodyGetRotation(ballBody), ball_radius);
-	//draw_sphere(left_hook_pos, cpBodyGetRotation(leftHookBody), hook_radius);
-	//draw_sphere(right_hook_pos, cpBodyGetRotation(rightHookBody), hook_radius);
+	// Draw level
+
+	cpSpaceBBQuery(space, cpBBNew(ball_pos.x - 160, ball_pos.y - 100, ball_pos.x + 160, ball_pos.y + 100), cpShapeFilterNew(0, 1 << CP_CATEGORY_CAMERA, 1 << CP_CATEGORY_LEVEL), [](cpShape *shape, void *data) {
+		cpBody *body = cpShapeGetBody(shape);
+		if (body != cpSpaceGetStaticBody(space))
+			return;
+
+		struct shape_user_data *user_data = (struct shape_user_data *) cpShapeGetUserData(shape);
+		if (user_data->filled)
+			drawPolyShapeBody(body, shape);
+
+	}, NULL);
+
+	cpSpaceBBQuery(space, cpBBNew(ball_pos.x - 160, ball_pos.y - 100, ball_pos.x + 160, ball_pos.y + 100), cpShapeFilterNew(0, 1 << CP_CATEGORY_CAMERA, 1 << CP_CATEGORY_LEVEL), [](cpShape *shape, void *data) {
+		cpBody *body = cpShapeGetBody(shape);
+		if (body != cpSpaceGetStaticBody(space))
+			return;
+
+		struct shape_user_data *user_data = (struct shape_user_data *) cpShapeGetUserData(shape);
+		if (!user_data->filled)
+			drawPolyShapeBody(body, shape);
+
+	}, NULL);
+
+	// Draw player
+
+	for (auto shape: player_shapes) {
+		cpBody *body = cpShapeGetBody(shape);
+		drawPolyShapeBody(body, shape);
+	}
+
+	glColor3f(0, 0, 0);
 
 	const float arm_length = max_rope_length / 2.;
 
@@ -353,22 +428,9 @@ static void display()
 
 	glEnd();
 
-	cpSpaceBBQuery(space, cpBBNew(ball_pos.x - 160, ball_pos.y - 100, ball_pos.x + 160, ball_pos.y + 100), cpShapeFilterNew(0, 1 << CP_CATEGORY_CAMERA, 1 << CP_CATEGORY_LEVEL), [](cpShape *shape, void *data) {
-		cpBody *body = cpShapeGetBody(shape);
-		if (body != cpSpaceGetStaticBody(space))
-			return;
-
-		drawPolyShapeBody(body, shape);
-
-	}, NULL);
-
-	glColor3f(1, 0, 0);
-
-	cpSpaceBBQuery(space, cpBBNew(ball_pos.x - 160, ball_pos.y - 100, ball_pos.x + 160, ball_pos.y + 100), cpShapeFilterNew(2, 1 << CP_CATEGORY_CAMERA, 1 << CP_CATEGORY_RAGDOLL), [](cpShape *shape, void *data) {
-		cpBody *body = cpShapeGetBody(shape);
-
-		drawPolyShapeBody(body, shape);
-	}, NULL);
+	draw_sphere(ball_pos, cpBodyGetRotation(ballBody), ball_radius);
+	//draw_sphere(left_hook_pos, cpBodyGetRotation(leftHookBody), hook_radius);
+	//draw_sphere(right_hook_pos, cpBodyGetRotation(rightHookBody), hook_radius);
 
 	SDL_GL_SwapBuffers();
 }
@@ -582,6 +644,9 @@ int main(int argc, char *argv[])
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
 		exit(1);
+
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 
 	surface = SDL_SetVideoMode(4 * 320, 4 * 200, 32, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_OPENGL);
 	if (!surface)

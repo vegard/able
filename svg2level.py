@@ -13,6 +13,8 @@ doc = minidom.parse('LEVEL-320x200.svg')
 
 polygons = []
 for path in doc.getElementsByTagName('path'):
+    g = path.parentNode
+
     #if path.getAttribute('id') != 'path919':
     #    continue
 
@@ -23,7 +25,27 @@ for path in doc.getElementsByTagName('path'):
         for arg in command.split(','):
             commands.append(arg)
 
+    label = g.getAttribute('inkscape:label')
+
+    color = (0, 0, 0)
+
+    style = path.getAttribute('style')
+    for attr in style.split(';'):
+        name, value = attr.split(':')
+        if name == 'fill':
+            assert len(value) == 7
+            assert value[0] == '#'
+            value = value[1:]
+            r = int(value[0:2], 16)
+            g = int(value[2:4], 16)
+            b = int(value[4:6], 16)
+            color = (r, g, b)
+
     points = []
+
+    def save_polygon():
+        if len(points) > 0:
+            polygons.append((label, color, points))
 
     # https://www.w3.org/TR/SVG/paths.html
     # https://pomax.github.io/bezierinfo/
@@ -142,24 +164,24 @@ for path in doc.getElementsByTagName('path'):
             # the path with its initial point
             x, y = points[0]
             points.append((x, y))
-            if len(points) > 0:
-                polygons.append(points)
+            save_polygon()
             points = []
             i += 1
 
         else:
             assert False, "Unknown command: %r" % (commands[i:], )
 
-    if len(points) > 0:
-        polygons.append(points)
+    save_polygon()
 
-for points in polygons:
+for label, color, points in polygons:
     print "{"
     print "static const cpVect verts[%u] = {" % (len(points), )
     for x, y in points:
         print "\tcpv(%f, %f)," % (x, y - 97)
     print "};"
     print "static shape_user_data user_data = {"
+    print "\t.color = { %u, %u, %u }," % color
+    print "\t.filled = %s," % ('true' if label == 'Geometry' else 'false')
     print "\t.verts = verts,"
     print "\t.nr_verts = %u," % (len(points), )
     print "};"
