@@ -116,7 +116,7 @@ for path in doc.getElementsByTagName('path'):
 
         elif commands[i] == 'L':
             i = i + 1
-            while i < n and not re.match(r'^\w$', commands[i]):
+            while i < n and not re.match(r'^[A-Za-z]$', commands[i]):
                 # Draw a line from the current point to the end point,
                 # which is the current point shifted by dx along the x-axis
                 # and dy along the y-axis
@@ -127,7 +127,7 @@ for path in doc.getElementsByTagName('path'):
 
         elif commands[i] == 'l':
             i = i + 1
-            while i < n and not re.match(r'^\w$', commands[i]):
+            while i < n and not re.match(r'^[A-Za-z]$', commands[i]):
                 # Draw a line from the current point to the end point,
                 # which is the current point shifted by dx along the x-axis
                 # and dy along the y-axis
