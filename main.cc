@@ -544,7 +544,9 @@ static void keyboard(SDL_KeyboardEvent *key)
 	case SDLK_r:
 		{
 			//cpVect target_pos = cpv(416, -833);
-			cpVect target_pos = cpv(416, -953);
+			//cpVect target_pos = cpv(416, -953);
+			cpVect target_pos = cpv(425, -1020);
+			//cpVect target_pos = cpv(425, -1120);
 			cpVect body_pos = cpBodyGetPosition(ballBody);
 
 			for (auto body: { ballBody, torso, leftUpperLeg, rightUpperLeg, leftLowerLeg, rightLowerLeg }) {
@@ -632,9 +634,21 @@ static void update()
 			cpDampedSpringSetRestLength(rightHookSpring, max_rope_length);
 	}
 
+	cpVect pos = cpBodyGetPosition(ballBody);
+
+	static bool finished = false;
+	if (!finished && pos.y < -1030 && pos.x > 420 && pos.x < 430) {
+		// yo, good job, you crossed the finish line
+		finished = true;
+		cpSpaceSetGravity(space, cpv(0, 0));
+
+		// turn off collisions for the player
+		for (auto shape: player_shapes)
+			cpShapeSetFilter(shape, CP_SHAPE_FILTER_NONE);
+	}
+
 	/* Update camera */
 	{
-		cpVect pos = cpBodyGetPosition(ballBody);
 		camera_x = .5 * camera_x + .5 * pos.x;
 		camera_y = .5 * camera_y + .5 * pos.y;
 	}
