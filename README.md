@@ -15,6 +15,8 @@ Please note that being a #LudwigJam game, the game is fairly short. My PB is cur
 
 Please see the game's website at <https://vegard.itch.io/able>.
 
+The game runs on Linux and Windows.
+
 
 ## Building
 
@@ -23,7 +25,8 @@ The build scripts were made to work on my machine, so you will likely have to ad
 Requirements:
 
 * OpenGL
-* [SDL 1.2](http://www.libsdl.org/)
+* [SDL 2](http://www.libsdl.org/)
+* [SDL\_Image 2.0](https://www.libsdl.org/projects/SDL_image/)
 * [Chipmunk2D 7.0.3](https://chipmunk-physics.net/)
 
 

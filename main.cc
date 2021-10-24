@@ -828,8 +828,6 @@ int main(int argc, char *argv[])
 
 	timer_start = SDL_GetTicks();
 
-	Uint64 frame_start = SDL_GetTicks();
-
 	bool running = true;
 	while (running) {
 		SDL_Event event;
@@ -860,19 +858,6 @@ int main(int argc, char *argv[])
 		cpSpaceStep(space, 1. / 60);
 
 		display();
-
-		Uint64 frame_end = SDL_GetTicks();
-
-		// cap to 60 fps
-		Uint64 delta = frame_end - frame_start;
-#if 0
-		float delay = floor(1000. / 60. - delta / 1000.);
-fprintf(stderr, "%f\n", delay);
-		if (delay > 0)
-			SDL_Delay(delay);
-#endif
-
-		frame_start = frame_end;
 	}
 
 	SDL_Quit();
