@@ -46,6 +46,8 @@ struct shape_user_data {
 
 /* Runtime state */
 
+static Uint32 timer_start;
+
 static SDL_Surface *surface;
 
 static cpSpace *space;
@@ -56,6 +58,8 @@ static cpBody *leftUpperLeg;
 static cpBody *rightUpperLeg;
 static cpBody *leftLowerLeg;
 static cpBody *rightLowerLeg;
+
+static cpConstraint *balanceConstraint;
 
 static std::vector<cpShape *> player_shapes;
 
@@ -133,7 +137,7 @@ static void init()
 		cpShapeSetElasticity(ballShape, 1.);
 		cpShapeSetFriction(ballShape, 1.);
 
-		cpSpaceAddConstraint(space, cpDampedRotarySpringNew(staticBody, ballBody, 0., 1000., 100.));
+		balanceConstraint = cpSpaceAddConstraint(space, cpDampedRotarySpringNew(staticBody, ballBody, 0., 1000., 100.));
 		cpShapeSetFilter(ballShape, cpShapeFilterNew(1, 1 << CP_CATEGORY_PLAYER, CP_ALL_CATEGORIES));
 	}
 
@@ -432,6 +436,79 @@ static void display()
 	//draw_sphere(left_hook_pos, cpBodyGetRotation(leftHookBody), hook_radius);
 	//draw_sphere(right_hook_pos, cpBodyGetRotation(rightHookBody), hook_radius);
 
+	// draw HUD (timer)
+
+	glEnable(GL_TEXTURE);
+
+	glLoadIdentity();
+
+	{
+		Uint32 timer = SDL_GetTicks() - timer_start;
+
+		unsigned int ms = timer % 1000;
+		timer /= 1000;
+		unsigned int secs = timer % 60;
+		timer /= 60;
+		unsigned int mins = timer % 60;
+		timer /= 60;
+		unsigned int hours = timer;
+
+		char timer_buf[16];
+		if (hours > 0) {
+			snprintf(timer_buf, sizeof(timer_buf), "%02u:%02u:%02u.%03u", hours, mins, secs, ms);
+		} else if (mins > 0) {
+			snprintf(timer_buf, sizeof(timer_buf),      "%02u:%02u.%03u",        mins, secs, ms);
+		} else {
+			snprintf(timer_buf, sizeof(timer_buf),           "%02u.%03u",              secs, ms);
+		}
+
+		unsigned int n = strlen(timer_buf);
+
+		// font is 48x96 per character
+
+		glColor3f(1, 1, 1);
+
+		glBegin(GL_QUADS);
+
+		for (unsigned int i = n; i > 0; --i) {
+			char ch = timer_buf[i - 1];
+
+			if (ch >= '0' && ch <= '9') {
+				ch = ch - '0';
+			} else if (ch == ':') {
+				ch = 10;
+			} else if (ch == '.') {
+				ch = 11;
+			} else if (ch == ' ') {
+				continue;
+			} else {
+				assert(false);
+			}
+
+			float x = 320 - 48 / 4 * i;
+			float y = 200 - 96 / 4;
+
+			float t0 = 48 * ch;
+			float t1 = 48 * (ch + 1);
+
+			glTexCoord2f(t0, 0);
+			glVertex2f(x, y);
+
+			glTexCoord2f(t0, 1);
+			glVertex2f(x, y + 96 / 4);
+
+			glTexCoord2f(t1, 1);
+			glVertex2f(x + 48 / 4, y + 96 / 4);
+
+			glTexCoord2f(t1, 0);
+			glVertex2f(x + 48 / 4, y);
+		}
+
+		glEnd();
+	}
+
+	glDisable(GL_TEXTURE);
+
 	SDL_GL_SwapBuffers();
 }
 
@@ -449,6 +526,48 @@ static void joystick_button_down(SDL_JoyButtonEvent &e)
 {
 	if (e.button == 1)
 		jump = true;
+}
+
+static void release_left()
+{
+	// cut the line
+	left_hook_out = false;
+	left_hook_stop = NULL;
+
+	cpSpaceRemoveConstraint(space, leftHookOutJoint);
+
+	if (leftHookSpring) {
+		cpSpaceRemoveConstraint(space, leftGripJoint);
+		cpSpaceRemoveConstraint(space, leftHookSpring);
+		cpConstraintFree(leftHookSpring);
+		leftHookSpring = NULL;
+	}
+
+	if (cpSpaceContainsBody(space, leftHookBody))
+		cpSpaceRemoveBody(space, leftHookBody);
+	if (cpSpaceContainsShape(space, leftHookShape))
+		cpSpaceRemoveShape(space, leftHookShape);
+}
+
+static void release_right()
+{
+	// cut the line
+	right_hook_out = false;
+	right_hook_stop = NULL;
+
+	cpSpaceRemoveConstraint(space, rightHookOutJoint);
+
+	if (rightHookSpring) {
+		cpSpaceRemoveConstraint(space, rightGripJoint);
+		cpSpaceRemoveConstraint(space, rightHookSpring);
+		cpConstraintFree(rightHookSpring);
+		rightHookSpring = NULL;
+	}
+
+	if (cpSpaceContainsBody(space, rightHookBody))
+		cpSpaceRemoveBody(space, rightHookBody);
+	if (cpSpaceContainsShape(space, rightHookShape))
+		cpSpaceRemoveShape(space, rightHookShape);
 }
 
 static void keyboard(SDL_KeyboardEvent *key)
@@ -476,23 +595,7 @@ static void keyboard(SDL_KeyboardEvent *key)
 				cpBodyLocalToWorld(ballBody, cpv(-hook_velocity, -hook_velocity)) - cpBodyLocalToWorld(ballBody, cpv(0, 0)),
 				ball_pos);
 		} else {
-			// cut the line
-			left_hook_out = false;
-			left_hook_stop = NULL;
-
-			cpSpaceRemoveConstraint(space, leftHookOutJoint);
-
-			if (leftHookSpring) {
-				cpSpaceRemoveConstraint(space, leftGripJoint);
-				cpSpaceRemoveConstraint(space, leftHookSpring);
-				cpConstraintFree(leftHookSpring);
-				leftHookSpring = NULL;
-			}
-
-			if (cpSpaceContainsBody(space, leftHookBody))
-				cpSpaceRemoveBody(space, leftHookBody);
-			if (cpSpaceContainsShape(space, leftHookShape))
-				cpSpaceRemoveShape(space, leftHookShape);
+			release_left();
 		}
 
 		break;
@@ -519,43 +622,35 @@ static void keyboard(SDL_KeyboardEvent *key)
 				cpBodyLocalToWorld(ballBody, cpv(hook_velocity, -hook_velocity)) - cpBodyLocalToWorld(ballBody, cpv(0, 0)),
 				ball_pos);
 		} else {
-			// cut the line
-			right_hook_out = false;
-			right_hook_stop = NULL;
-
-			cpSpaceRemoveConstraint(space, rightHookOutJoint);
-
-			if (rightHookSpring) {
-				cpSpaceRemoveConstraint(space, rightGripJoint);
-				cpSpaceRemoveConstraint(space, rightHookSpring);
-				cpConstraintFree(rightHookSpring);
-				rightHookSpring = NULL;
-			}
-
-			if (cpSpaceContainsBody(space, rightHookBody))
-				cpSpaceRemoveBody(space, rightHookBody);
-			if (cpSpaceContainsShape(space, rightHookShape))
-				cpSpaceRemoveShape(space, rightHookShape);
+			release_right();
 		}
 
 		break;
 
-#if 0
 	case SDLK_r:
 		{
+			if (left_hook_out)
+				release_left();
+			if (right_hook_out)
+				release_right();
+
 			//cpVect target_pos = cpv(416, -833);
 			//cpVect target_pos = cpv(416, -953);
-			cpVect target_pos = cpv(425, -1020);
+			//cpVect target_pos = cpv(425, -1020);
 			//cpVect target_pos = cpv(425, -1120);
+			cpVect target_pos = cpv(160, 80);
 			cpVect body_pos = cpBodyGetPosition(ballBody);
 
 			for (auto body: { ballBody, torso, leftUpperLeg, rightUpperLeg, leftLowerLeg, rightLowerLeg }) {
 				cpBodySetPosition(body, target_pos + cpBodyGetPosition(body) - body_pos);
 				cpBodySetVelocity(body, cpv(0, 0));
+				cpBodySetAngle(body, 0);
+				cpBodySetTorque(body, 0);
 			}
+
+			timer_start = SDL_GetTicks();
 		}
 		break;
-#endif
 
 	case SDLK_UP:
 		break;
@@ -642,6 +737,8 @@ static void update()
 		finished = true;
 		cpSpaceSetGravity(space, cpv(0, 0));
 
+		cpSpaceRemove(space, balanceConstraint);
+
 		// turn off collisions for the player
 		for (auto shape: player_shapes)
 			cpShapeSetFilter(shape, CP_SHAPE_FILTER_NONE);
@@ -670,6 +767,8 @@ int main(int argc, char *argv[])
 	SDL_Joystick *input = SDL_JoystickOpen(0);
 
 	init();
+
+	timer_start = SDL_GetTicks();
 
 	bool running = true;
 	while (running) {
