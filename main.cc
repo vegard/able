@@ -46,6 +46,9 @@ struct shape_user_data {
 
 /* Runtime state */
 
+static bool finished;
+static Uint32 finished_time;
+
 static Uint32 timer_start;
 
 static SDL_Surface *surface;
@@ -81,6 +84,33 @@ static cpConstraint *rightHookSpring;
 
 static float camera_x, camera_y;
 
+struct texture {
+        SDL_Surface *surface;
+        GLuint id;
+
+        texture(const char *filename)
+        {
+                surface = IMG_Load(filename);
+                assert(surface);
+
+                glGenTextures(1, &id);
+                glBindTexture(GL_TEXTURE_2D, id);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                glTexImage2D(GL_TEXTURE_2D, 0,
+                        surface->format->BytesPerPixel,
+                        surface->w, surface->h, 0,
+                        GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+        }
+
+        void bind()
+        {
+                glBindTexture(GL_TEXTURE_2D, id);
+        }
+};
+
+static texture *font_texture;
+
 static void init()
 {
 	/* Graphics */
@@ -104,6 +134,8 @@ static void init()
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+
+	font_texture = new texture("font.png");
 
 	/* Physics */
 	//cpInitChipmunk();
@@ -316,6 +348,8 @@ static void drawPolyShapeBody(cpBody *body, cpShape *shape)
 
 static void display()
 {
+	glDisable(GL_TEXTURE_2D);
+
 	glClearColor(1, 1, 1, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
@@ -438,12 +472,13 @@ static void display()
 
 	// draw HUD (timer)
 
-	glEnable(GL_TEXTURE);
+	glEnable(GL_TEXTURE_2D);
+	font_texture->bind();
 
 	glLoadIdentity();
 
 	{
-		Uint32 timer = SDL_GetTicks() - timer_start;
+		Uint32 timer = (finished ? finished_time : SDL_GetTicks()) - timer_start;
 
 		unsigned int ms = timer % 1000;
 		timer /= 1000;
@@ -455,18 +490,18 @@ static void display()
 
 		char timer_buf[16];
 		if (hours > 0) {
-			snprintf(timer_buf, sizeof(timer_buf), "%02u:%02u:%02u.%03u", hours, mins, secs, ms);
+			snprintf(timer_buf, sizeof(timer_buf), "%u:%02u:%02u.%03u", hours, mins, secs, ms);
 		} else if (mins > 0) {
-			snprintf(timer_buf, sizeof(timer_buf),      "%02u:%02u.%03u",        mins, secs, ms);
+			snprintf(timer_buf, sizeof(timer_buf),      "%u:%02u.%03u",        mins, secs, ms);
 		} else {
-			snprintf(timer_buf, sizeof(timer_buf),           "%02u.%03u",              secs, ms);
+			snprintf(timer_buf, sizeof(timer_buf),           "%u.%03u",              secs, ms);
 		}
 
 		unsigned int n = strlen(timer_buf);
 
 		// font is 48x96 per character
 
-		glColor3f(1, 1, 1);
+		glColor4f(1, 1, 1, 1);
 
 		glBegin(GL_QUADS);
 
@@ -485,11 +520,11 @@ static void display()
 				assert(false);
 			}
 
-			float x = 320 - 48 / 4 * i;
+			float x = 320 - 48 / 4 * (n - i);
 			float y = 200 - 96 / 4;
 
-			float t0 = 48 * ch;
-			float t1 = 48 * (ch + 1);
+			float t0 = ch / 12.;
+			float t1 = (ch + 1) / 12.;
 
 			glTexCoord2f(t0, 0);
 			glVertex2f(x, y);
@@ -506,8 +541,6 @@ static void display()
 
 		glEnd();
 	}
-
-	glDisable(GL_TEXTURE);
 
 	SDL_GL_SwapBuffers();
 }
@@ -731,13 +764,13 @@ static void update()
 
 	cpVect pos = cpBodyGetPosition(ballBody);
 
-	static bool finished = false;
 	if (!finished && pos.y < -1030 && pos.x > 420 && pos.x < 430) {
 		// yo, good job, you crossed the finish line
 		finished = true;
-		cpSpaceSetGravity(space, cpv(0, 0));
+		finished_time = SDL_GetTicks();
 
-		cpSpaceRemove(space, balanceConstraint);
+		cpSpaceSetGravity(space, cpv(0, 0));
+		cpSpaceRemoveConstraint(space, balanceConstraint);
 
 		// turn off collisions for the player
 		for (auto shape: player_shapes)
