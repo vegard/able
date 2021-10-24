@@ -1,15 +1,29 @@
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include <cassert>
+#include <cstdio>
 #include <vector>
 
-extern "C" {
 #include <SDL.h>
-#include <SDL2/SDL_image.h>
 
+#ifdef _WIN32
+#include <SDL_image.h>
+#else
+#include <SDL2/SDL_image.h>
+#endif
+
+extern "C" {
 #include <GL/gl.h>
 #include <GL/glu.h>
 }
 
+#ifdef _WIN32
+#include <chipmunk/chipmunk.h>
+#else
 #include <chipmunk.h>
+#endif
 
 /* Parameters */
 
@@ -92,7 +106,10 @@ struct texture {
         texture(const char *filename)
         {
                 surface = IMG_Load(filename);
-                assert(surface);
+		if (!surface) {
+			fprintf(stderr, "IMG_Load(): %s\n", IMG_GetError());
+			exit(1);
+		}
 
                 glGenTextures(1, &id);
                 glBindTexture(GL_TEXTURE_2D, id);
@@ -784,7 +801,7 @@ static void update()
 //extern "C"
 int main(int argc, char *argv[])
 {
-	if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
+	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0)
 		exit(1);
 
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
@@ -796,11 +813,16 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
+#if 0
 	renderer = SDL_CreateRenderer(window, -1, 0);
 	if (!renderer) {
 		fprintf(stderr, "SDL_CreateRenderer() failed\n");
 		exit(1);
 	}
+#endif
+
+	SDL_GLContext glcontext = SDL_GL_CreateContext(window);
+	SDL_GL_SetSwapInterval(1);
 
 	init();
 
@@ -843,9 +865,12 @@ int main(int argc, char *argv[])
 
 		// cap to 60 fps
 		Uint64 delta = frame_end - frame_start;
+#if 0
 		float delay = floor(1000. / 60. - delta / 1000.);
+fprintf(stderr, "%f\n", delay);
 		if (delay > 0)
 			SDL_Delay(delay);
+#endif
 
 		frame_start = frame_end;
 	}
