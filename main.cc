@@ -151,9 +151,6 @@ static void init()
 
 	staticBody = cpSpaceGetStaticBody(space);
 
-	float left_wall = 320 / 2 - 20;
-	float right_wall = 320 / 2 + 40;
-
 #include "level.c"
 
 	{
@@ -247,8 +244,6 @@ static void init()
 		};
 	}
 }
-
-static double frame = 0;
 
 static void draw_sphere(cpVect pos, cpVect rot, float radius)
 {
@@ -796,9 +791,6 @@ int main(int argc, char *argv[])
 	surface = SDL_SetVideoMode(4 * 320, 4 * 200, 32, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_OPENGL);
 	if (!surface)
 		exit(1);
-
-	SDL_JoystickEventState(SDL_ENABLE);
-	SDL_Joystick *input = SDL_JoystickOpen(0);
 
 	init();
 
