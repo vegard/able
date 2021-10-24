@@ -682,6 +682,7 @@ static void keyboard(SDL_KeyboardEvent *key)
 			}
 
 			timer_start = SDL_GetTicks();
+			finished = false;
 		}
 		break;
 
