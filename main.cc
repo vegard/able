@@ -3,7 +3,7 @@
 
 extern "C" {
 #include <SDL.h>
-#include <SDL/SDL_image.h>
+#include <SDL2/SDL_image.h>
 
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -51,7 +51,8 @@ static Uint32 finished_time;
 
 static Uint32 timer_start;
 
-static SDL_Surface *surface;
+static SDL_Window *window;
+static SDL_Renderer *renderer;
 
 static cpSpace *space;
 static cpBody *staticBody;
@@ -537,7 +538,7 @@ static void display()
 		glEnd();
 	}
 
-	SDL_GL_SwapBuffers();
+	SDL_GL_SwapWindow(window);
 }
 
 static bool jump = false;
@@ -712,7 +713,7 @@ static void keyboard_up(SDL_KeyboardEvent *key)
 
 static void update()
 {
-	const Uint8 *state = SDL_GetKeyState(NULL);
+	const Uint8 *state = SDL_GetKeyboardState(NULL);
 
 	if (left_hook_stop) {
 		cpVect pos = cpBodyGetPosition(leftHookBody);
@@ -745,14 +746,14 @@ static void update()
 	}
 
 	if (leftHookSpring) {
-		if (state[SDLK_w])
+		if (state[SDL_SCANCODE_W])
 			cpDampedSpringSetRestLength(leftHookSpring, min_rope_length);
 		else
 			cpDampedSpringSetRestLength(leftHookSpring, max_rope_length);
 	}
 
 	if (rightHookSpring) {
-		if (state[SDLK_o])
+		if (state[SDL_SCANCODE_O])
 			cpDampedSpringSetRestLength(rightHookSpring, min_rope_length);
 		else
 			cpDampedSpringSetRestLength(rightHookSpring, max_rope_length);
@@ -780,6 +781,7 @@ static void update()
 	}
 }
 
+//extern "C"
 int main(int argc, char *argv[])
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
@@ -788,13 +790,23 @@ int main(int argc, char *argv[])
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 
-	surface = SDL_SetVideoMode(4 * 320, 4 * 200, 32, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_OPENGL);
-	if (!surface)
+	window = SDL_CreateWindow("Able", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 4 * 320, 4 * 200, SDL_WINDOW_OPENGL);
+	if (!window) {
+		fprintf(stderr, "SDL_CreateWindow() failed\n");
 		exit(1);
+	}
+
+	renderer = SDL_CreateRenderer(window, -1, 0);
+	if (!renderer) {
+		fprintf(stderr, "SDL_CreateRenderer() failed\n");
+		exit(1);
+	}
 
 	init();
 
 	timer_start = SDL_GetTicks();
+
+	Uint64 frame_start = SDL_GetTicks();
 
 	bool running = true;
 	while (running) {
@@ -824,11 +836,18 @@ int main(int argc, char *argv[])
 		update();
 
 		cpSpaceStep(space, 1. / 60);
-		//cpBodyResetForces(ballBody);
 
 		display();
 
-		SDL_Delay(10);
+		Uint64 frame_end = SDL_GetTicks();
+
+		// cap to 60 fps
+		Uint64 delta = frame_end - frame_start;
+		float delay = floor(1000. / 60. - delta / 1000.);
+		if (delay > 0)
+			SDL_Delay(delay);
+
+		frame_start = frame_end;
 	}
 
 	SDL_Quit();
