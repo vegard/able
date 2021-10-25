@@ -29,7 +29,7 @@ extern "C" {
 
 static const cpFloat head_radius = 8;
 static const cpFloat hand_radius = 1.;
-static const cpFloat max_rope_length = 40.;
+static const cpFloat max_arm_length = 40.;
 
 static const cpFloat hand_velocity = 10.;
 
@@ -37,7 +37,7 @@ static const cpFloat hand_stiffness = 50.;
 static const cpFloat hand_damping = 5.;
 
 static const cpFloat reel_in_velocity = .5;
-static const cpFloat min_rope_length = 5.;
+static const cpFloat min_arm_length = 5.;
 
 static const cpVect left_shoulder_offset = cpv(-head_radius, head_radius);
 static const cpVect right_shoulder_offset = cpv(head_radius, head_radius);
@@ -232,11 +232,11 @@ static void init()
 		cpShapeSetFilter(rightHandShape, cpShapeFilterNew(1, 1 << CP_CATEGORY_PLAYER, CP_ALL_CATEGORIES));
 	}
 
-	leftHandOutJoint = cpSlideJointNew(headBody, leftHandBody, left_shoulder_offset, cpv(hand_radius, 0), 0., max_rope_length);
-	leftGripJoint = cpSlideJointNew(headBody, staticBody, left_shoulder_offset, cpv(0, 0), 0., max_rope_length);
+	leftHandOutJoint = cpSlideJointNew(headBody, leftHandBody, left_shoulder_offset, cpv(hand_radius, 0), 0., max_arm_length);
+	leftGripJoint = cpSlideJointNew(headBody, staticBody, left_shoulder_offset, cpv(0, 0), 0., max_arm_length);
 
-	rightHandOutJoint = cpSlideJointNew(headBody, rightHandBody, right_shoulder_offset, cpv(-hand_radius, 0), 0., max_rope_length);
-	rightGripJoint = cpSlideJointNew(headBody, staticBody, right_shoulder_offset, cpv(0, 0), 0., max_rope_length);
+	rightHandOutJoint = cpSlideJointNew(headBody, rightHandBody, right_shoulder_offset, cpv(-hand_radius, 0), 0., max_arm_length);
+	rightGripJoint = cpSlideJointNew(headBody, staticBody, right_shoulder_offset, cpv(0, 0), 0., max_arm_length);
 
 	{
 		cpCollisionHandler *handler = cpSpaceAddCollisionHandler(space, 0, 1);
@@ -395,7 +395,7 @@ static void display()
 
 	glColor3f(0, 0, 0);
 
-	const float arm_length = max_rope_length / 2.;
+	const float arm_length = max_arm_length / 2.;
 
 	glBegin(GL_LINES);
 
@@ -695,7 +695,7 @@ static void update()
 
 		leftHandSpring = cpSpaceAddConstraint(space, cpDampedSpringNew(headBody, left_hand_stop,
 			cpv(-head_radius, 0), cpBodyWorldToLocal(left_hand_stop, pos),
-			max_rope_length,
+			max_arm_length,
 			hand_stiffness, hand_damping));
 
 		cpSlideJointSetAnchorB(leftGripJoint, cpBodyWorldToLocal(staticBody, pos));
@@ -710,7 +710,7 @@ static void update()
 
 		rightHandSpring = cpSpaceAddConstraint(space, cpDampedSpringNew(headBody, right_hand_stop,
 			cpv(head_radius, 0), cpBodyWorldToLocal(right_hand_stop, pos),
-			max_rope_length,
+			max_arm_length,
 			hand_stiffness, hand_damping));
 
 		cpSlideJointSetAnchorB(rightGripJoint, cpBodyWorldToLocal(staticBody, pos));
@@ -721,16 +721,16 @@ static void update()
 
 	if (leftHandSpring) {
 		if (state[SDL_SCANCODE_W])
-			cpDampedSpringSetRestLength(leftHandSpring, min_rope_length);
+			cpDampedSpringSetRestLength(leftHandSpring, min_arm_length);
 		else
-			cpDampedSpringSetRestLength(leftHandSpring, max_rope_length);
+			cpDampedSpringSetRestLength(leftHandSpring, max_arm_length);
 	}
 
 	if (rightHandSpring) {
 		if (state[SDL_SCANCODE_O])
-			cpDampedSpringSetRestLength(rightHandSpring, min_rope_length);
+			cpDampedSpringSetRestLength(rightHandSpring, min_arm_length);
 		else
-			cpDampedSpringSetRestLength(rightHandSpring, max_rope_length);
+			cpDampedSpringSetRestLength(rightHandSpring, max_arm_length);
 	}
 
 	cpVect pos = cpBodyGetPosition(headBody);
