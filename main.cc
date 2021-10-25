@@ -82,21 +82,21 @@ static cpConstraint *balanceConstraint;
 
 static std::vector<cpShape *> player_shapes;
 
-static cpBody *leftHookBody;
-static cpShape *leftHookShape;
-static cpConstraint *leftHookOutJoint;
+static cpBody *leftHandBody;
+static cpShape *leftHandShape;
+static cpConstraint *leftHandOutJoint;
 static cpConstraint *leftGripJoint;
 static bool left_hand_out = false;
 static cpBody *left_hand_stop;
-static cpConstraint *leftHookSpring;
+static cpConstraint *leftHandSpring;
 
-static cpBody *rightHookBody;
-static cpShape *rightHookShape;
-static cpConstraint *rightHookOutJoint;
+static cpBody *rightHandBody;
+static cpShape *rightHandShape;
+static cpConstraint *rightHandOutJoint;
 static cpConstraint *rightGripJoint;
 static bool right_hand_out = false;
 static cpBody *right_hand_stop;
-static cpConstraint *rightHookSpring;
+static cpConstraint *rightHandSpring;
 
 static float camera_x, camera_y;
 
@@ -220,29 +220,29 @@ static void init()
 		//cpFloat moment = cpMomentForCircle(mass, 0, hand_radius, cpvzero);
 		cpFloat moment = INFINITY;
 
-		leftHookBody = cpBodyNew(mass, moment);
-		cpBodySetPosition(leftHookBody, cpv(160 - head_radius - hand_radius, 100));
+		leftHandBody = cpBodyNew(mass, moment);
+		cpBodySetPosition(leftHandBody, cpv(160 - head_radius - hand_radius, 100));
 
-		leftHookShape = cpCircleShapeNew(leftHookBody, hand_radius, cpvzero);
-		cpShapeSetElasticity(leftHookShape, 0.);
-		cpShapeSetFriction(leftHookShape, 1.);
-		cpShapeSetCollisionType(leftHookShape, 1);
-		cpShapeSetFilter(leftHookShape, cpShapeFilterNew(1, 1 << CP_CATEGORY_PLAYER, CP_ALL_CATEGORIES));
+		leftHandShape = cpCircleShapeNew(leftHandBody, hand_radius, cpvzero);
+		cpShapeSetElasticity(leftHandShape, 0.);
+		cpShapeSetFriction(leftHandShape, 1.);
+		cpShapeSetCollisionType(leftHandShape, 1);
+		cpShapeSetFilter(leftHandShape, cpShapeFilterNew(1, 1 << CP_CATEGORY_PLAYER, CP_ALL_CATEGORIES));
 
-		rightHookBody = cpBodyNew(mass, moment);
-		cpBodySetPosition(rightHookBody, cpv(160 + head_radius + hand_radius, 100));
+		rightHandBody = cpBodyNew(mass, moment);
+		cpBodySetPosition(rightHandBody, cpv(160 + head_radius + hand_radius, 100));
 
-		rightHookShape = cpCircleShapeNew(rightHookBody, hand_radius, cpvzero);
-		cpShapeSetElasticity(rightHookShape, 0.);
-		cpShapeSetFriction(rightHookShape, 1.);
-		cpShapeSetCollisionType(rightHookShape, 1);
-		cpShapeSetFilter(rightHookShape, cpShapeFilterNew(1, 1 << CP_CATEGORY_PLAYER, CP_ALL_CATEGORIES));
+		rightHandShape = cpCircleShapeNew(rightHandBody, hand_radius, cpvzero);
+		cpShapeSetElasticity(rightHandShape, 0.);
+		cpShapeSetFriction(rightHandShape, 1.);
+		cpShapeSetCollisionType(rightHandShape, 1);
+		cpShapeSetFilter(rightHandShape, cpShapeFilterNew(1, 1 << CP_CATEGORY_PLAYER, CP_ALL_CATEGORIES));
 	}
 
-	leftHookOutJoint = cpSlideJointNew(headBody, leftHookBody, left_shoulder_offset, cpv(hand_radius, 0), 0., max_rope_length);
+	leftHandOutJoint = cpSlideJointNew(headBody, leftHandBody, left_shoulder_offset, cpv(hand_radius, 0), 0., max_rope_length);
 	leftGripJoint = cpSlideJointNew(headBody, staticBody, left_shoulder_offset, cpv(0, 0), 0., max_rope_length);
 
-	rightHookOutJoint = cpSlideJointNew(headBody, rightHookBody, right_shoulder_offset, cpv(-hand_radius, 0), 0., max_rope_length);
+	rightHandOutJoint = cpSlideJointNew(headBody, rightHandBody, right_shoulder_offset, cpv(-hand_radius, 0), 0., max_rope_length);
 	rightGripJoint = cpSlideJointNew(headBody, staticBody, right_shoulder_offset, cpv(0, 0), 0., max_rope_length);
 
 	{
@@ -254,9 +254,9 @@ static void init()
 			if (u != cpSpaceGetStaticBody(space))
 				return true;
 
-			if (v == leftHookBody)
+			if (v == leftHandBody)
 				left_hand_stop = u;
-			if (v == rightHookBody)
+			if (v == rightHandBody)
 				right_hand_stop = u;
 
 			return true;
@@ -421,7 +421,7 @@ static void display()
 	// see https://mathworld.wolfram.com/Circle-CircleIntersection.html
 
 	if (left_hand_out) {
-		cpVect left_hand_pos = cpBodyGetPosition(leftHookBody);
+		cpVect left_hand_pos = cpBodyGetPosition(leftHandBody);
 		cpVect left_shoulder_pos = cpBodyLocalToWorld(headBody, left_shoulder_offset);
 
 		cpVect delta = cpvsub(left_hand_pos, left_shoulder_pos);
@@ -450,7 +450,7 @@ static void display()
 	}
 
 	if (right_hand_out) {
-		cpVect right_hand_pos = cpBodyGetPosition(rightHookBody);
+		cpVect right_hand_pos = cpBodyGetPosition(rightHandBody);
 		cpVect right_shoulder_pos = cpBodyLocalToWorld(headBody, right_shoulder_offset);
 
 		cpVect delta = cpvsub(right_hand_pos, right_shoulder_pos);
@@ -481,8 +481,8 @@ static void display()
 	glEnd();
 
 	draw_sphere(head_pos, cpBodyGetRotation(headBody), head_radius);
-	//draw_sphere(left_hand_pos, cpBodyGetRotation(leftHookBody), hand_radius);
-	//draw_sphere(right_hand_pos, cpBodyGetRotation(rightHookBody), hand_radius);
+	//draw_sphere(left_hand_pos, cpBodyGetRotation(leftHandBody), hand_radius);
+	//draw_sphere(right_hand_pos, cpBodyGetRotation(rightHandBody), hand_radius);
 
 	// draw HUD (timer)
 
@@ -581,19 +581,19 @@ static void release_left()
 	left_hand_out = false;
 	left_hand_stop = NULL;
 
-	cpSpaceRemoveConstraint(space, leftHookOutJoint);
+	cpSpaceRemoveConstraint(space, leftHandOutJoint);
 
-	if (leftHookSpring) {
+	if (leftHandSpring) {
 		cpSpaceRemoveConstraint(space, leftGripJoint);
-		cpSpaceRemoveConstraint(space, leftHookSpring);
-		cpConstraintFree(leftHookSpring);
-		leftHookSpring = NULL;
+		cpSpaceRemoveConstraint(space, leftHandSpring);
+		cpConstraintFree(leftHandSpring);
+		leftHandSpring = NULL;
 	}
 
-	if (cpSpaceContainsBody(space, leftHookBody))
-		cpSpaceRemoveBody(space, leftHookBody);
-	if (cpSpaceContainsShape(space, leftHookShape))
-		cpSpaceRemoveShape(space, leftHookShape);
+	if (cpSpaceContainsBody(space, leftHandBody))
+		cpSpaceRemoveBody(space, leftHandBody);
+	if (cpSpaceContainsShape(space, leftHandShape))
+		cpSpaceRemoveShape(space, leftHandShape);
 }
 
 static void release_right()
@@ -602,19 +602,19 @@ static void release_right()
 	right_hand_out = false;
 	right_hand_stop = NULL;
 
-	cpSpaceRemoveConstraint(space, rightHookOutJoint);
+	cpSpaceRemoveConstraint(space, rightHandOutJoint);
 
-	if (rightHookSpring) {
+	if (rightHandSpring) {
 		cpSpaceRemoveConstraint(space, rightGripJoint);
-		cpSpaceRemoveConstraint(space, rightHookSpring);
-		cpConstraintFree(rightHookSpring);
-		rightHookSpring = NULL;
+		cpSpaceRemoveConstraint(space, rightHandSpring);
+		cpConstraintFree(rightHandSpring);
+		rightHandSpring = NULL;
 	}
 
-	if (cpSpaceContainsBody(space, rightHookBody))
-		cpSpaceRemoveBody(space, rightHookBody);
-	if (cpSpaceContainsShape(space, rightHookShape))
-		cpSpaceRemoveShape(space, rightHookShape);
+	if (cpSpaceContainsBody(space, rightHandBody))
+		cpSpaceRemoveBody(space, rightHandBody);
+	if (cpSpaceContainsShape(space, rightHandShape))
+		cpSpaceRemoveShape(space, rightHandShape);
 }
 
 static void keyboard(SDL_KeyboardEvent *key)
@@ -626,18 +626,18 @@ static void keyboard(SDL_KeyboardEvent *key)
 			left_hand_out = true;
 			left_hand_stop = NULL;
 
-			cpSpaceAddConstraint(space, leftHookOutJoint);
+			cpSpaceAddConstraint(space, leftHandOutJoint);
 
 			cpVect head_pos = cpBodyGetPosition(headBody);
 
-			cpSpaceAddShape(space, leftHookShape);
+			cpSpaceAddShape(space, leftHandShape);
 
-			//cpBodySetPosition(leftHookBody, cpBodyLocalToWorld(headBody, cpv(-head_radius - hand_radius, 0)));
-			cpBodySetPosition(leftHookBody, cpBodyLocalToWorld(headBody, cpv(-head_radius + 2. * hand_radius, 0)));
-			cpBodySetVelocity(leftHookBody, cpBodyGetVelocity(headBody));
-			cpSpaceAddBody(space, leftHookBody);
+			//cpBodySetPosition(leftHandBody, cpBodyLocalToWorld(headBody, cpv(-head_radius - hand_radius, 0)));
+			cpBodySetPosition(leftHandBody, cpBodyLocalToWorld(headBody, cpv(-head_radius + 2. * hand_radius, 0)));
+			cpBodySetVelocity(leftHandBody, cpBodyGetVelocity(headBody));
+			cpSpaceAddBody(space, leftHandBody);
 
-			cpBodyApplyImpulseAtWorldPoint(leftHookBody,
+			cpBodyApplyImpulseAtWorldPoint(leftHandBody,
 				//cpv(-5, 0),
 				cpBodyLocalToWorld(headBody, cpv(-hand_velocity, -hand_velocity)) - cpBodyLocalToWorld(headBody, cpv(0, 0)),
 				head_pos);
@@ -653,18 +653,18 @@ static void keyboard(SDL_KeyboardEvent *key)
 			right_hand_out = true;
 			right_hand_stop = NULL;
 
-			cpSpaceAddConstraint(space, rightHookOutJoint);
+			cpSpaceAddConstraint(space, rightHandOutJoint);
 
 			cpVect head_pos = cpBodyGetPosition(headBody);
 
-			cpSpaceAddShape(space, rightHookShape);
+			cpSpaceAddShape(space, rightHandShape);
 
-			//cpBodySetPosition(rightHookBody, cpBodyLocalToWorld(headBody, cpv(head_radius + hand_radius, 0)));
-			cpBodySetPosition(rightHookBody, cpBodyLocalToWorld(headBody, cpv(head_radius - 2. * hand_radius, 0)));
-			cpBodySetVelocity(rightHookBody, cpBodyGetVelocity(headBody));
-			cpSpaceAddBody(space, rightHookBody);
+			//cpBodySetPosition(rightHandBody, cpBodyLocalToWorld(headBody, cpv(head_radius + hand_radius, 0)));
+			cpBodySetPosition(rightHandBody, cpBodyLocalToWorld(headBody, cpv(head_radius - 2. * hand_radius, 0)));
+			cpBodySetVelocity(rightHandBody, cpBodyGetVelocity(headBody));
+			cpSpaceAddBody(space, rightHandBody);
 
-			cpBodyApplyImpulseAtWorldPoint(rightHookBody,
+			cpBodyApplyImpulseAtWorldPoint(rightHandBody,
 				//cpv(5, 0),
 				cpBodyLocalToWorld(headBody, cpv(hand_velocity, -hand_velocity)) - cpBodyLocalToWorld(headBody, cpv(0, 0)),
 				head_pos);
@@ -734,10 +734,10 @@ static void update()
 	const Uint8 *state = SDL_GetKeyboardState(NULL);
 
 	if (left_hand_stop) {
-		cpVect pos = cpBodyGetPosition(leftHookBody);
-		cpSpaceRemoveBody(space, leftHookBody);
+		cpVect pos = cpBodyGetPosition(leftHandBody);
+		cpSpaceRemoveBody(space, leftHandBody);
 
-		leftHookSpring = cpSpaceAddConstraint(space, cpDampedSpringNew(headBody, left_hand_stop,
+		leftHandSpring = cpSpaceAddConstraint(space, cpDampedSpringNew(headBody, left_hand_stop,
 			cpv(-head_radius, 0), cpBodyWorldToLocal(left_hand_stop, pos),
 			max_rope_length,
 			hand_stiffness, hand_damping));
@@ -749,10 +749,10 @@ static void update()
 	}
 
 	if (right_hand_stop) {
-		cpVect pos = cpBodyGetPosition(rightHookBody);
-		cpSpaceRemoveBody(space, rightHookBody);
+		cpVect pos = cpBodyGetPosition(rightHandBody);
+		cpSpaceRemoveBody(space, rightHandBody);
 
-		rightHookSpring = cpSpaceAddConstraint(space, cpDampedSpringNew(headBody, right_hand_stop,
+		rightHandSpring = cpSpaceAddConstraint(space, cpDampedSpringNew(headBody, right_hand_stop,
 			cpv(head_radius, 0), cpBodyWorldToLocal(right_hand_stop, pos),
 			max_rope_length,
 			hand_stiffness, hand_damping));
@@ -763,18 +763,18 @@ static void update()
 		right_hand_stop = NULL;
 	}
 
-	if (leftHookSpring) {
+	if (leftHandSpring) {
 		if (state[SDL_SCANCODE_W])
-			cpDampedSpringSetRestLength(leftHookSpring, min_rope_length);
+			cpDampedSpringSetRestLength(leftHandSpring, min_rope_length);
 		else
-			cpDampedSpringSetRestLength(leftHookSpring, max_rope_length);
+			cpDampedSpringSetRestLength(leftHandSpring, max_rope_length);
 	}
 
-	if (rightHookSpring) {
+	if (rightHandSpring) {
 		if (state[SDL_SCANCODE_O])
-			cpDampedSpringSetRestLength(rightHookSpring, min_rope_length);
+			cpDampedSpringSetRestLength(rightHandSpring, min_rope_length);
 		else
-			cpDampedSpringSetRestLength(rightHookSpring, max_rope_length);
+			cpDampedSpringSetRestLength(rightHandSpring, max_rope_length);
 	}
 
 	cpVect pos = cpBodyGetPosition(headBody);
