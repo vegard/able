@@ -67,6 +67,7 @@ static Uint32 timer_start;
 
 static SDL_Window *window;
 static SDL_Renderer *renderer;
+static SDL_GLContext glcontext;
 
 static cpSpace *space;
 static cpBody *staticBody;
@@ -796,9 +797,18 @@ static void update()
 		camera_x = .5 * camera_x + .5 * pos.x;
 		camera_y = .5 * camera_y + .5 * pos.y;
 	}
+
+	/* Finally, update physics */
+	cpSpaceStep(space, 1. / 60);
+
+	if (0) {
+		static Uint64 prev;
+		Uint64 cur = SDL_GetTicks();
+		fprintf(stderr, "%lu ms since last update()\n", (unsigned long) cur - prev);
+		prev = cur;
+	}
 }
 
-//extern "C"
 int main(int argc, char *argv[])
 {
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0)
@@ -813,20 +823,17 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-#if 0
-	renderer = SDL_CreateRenderer(window, -1, 0);
-	if (!renderer) {
-		fprintf(stderr, "SDL_CreateRenderer() failed\n");
-		exit(1);
-	}
-#endif
-
-	SDL_GLContext glcontext = SDL_GL_CreateContext(window);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
+	glcontext = SDL_GL_CreateContext(window);
 	SDL_GL_SetSwapInterval(1);
 
 	init();
 
+	static const Uint64 performance_frequency = SDL_GetPerformanceFrequency();
+
 	timer_start = SDL_GetTicks();
+
+	Uint64 frame_start = SDL_GetPerformanceCounter();
 
 	bool running = true;
 	while (running) {
@@ -853,11 +860,22 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		update();
+		Uint64 frame_end = SDL_GetPerformanceCounter();
+		Uint64 delta = frame_end - frame_start;
+		if (60 * delta >= performance_frequency) {
+			update();
+			display();
 
-		cpSpaceStep(space, 1. / 60);
+			frame_start = frame_end;
+		} else {
+			// How long can we sleep? (in ms)
+			float can_sleep = /* ms per frame */ 1000.f / 60
+				- /* ms since previous frame */ 1000.f * delta / performance_frequency;
 
-		display();
+			can_sleep = floor(can_sleep);
+			if (can_sleep > 0)
+				SDL_Delay(can_sleep);
+		}
 	}
 
 	SDL_Quit();
