@@ -148,6 +148,7 @@ static void init()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glEnable(GL_POLYGON_SMOOTH);
+	glLineWidth(2);
 
 	glEnable(GL_MULTISAMPLE);
 
