@@ -100,6 +100,9 @@ static bool right_hand_out = false;
 static cpBody *right_hand_stop;
 static cpConstraint *rightHandSpring;
 
+static bool head_collision;
+static bool head_collision_started;
+
 static float camera_x, camera_y;
 
 /* Assets */
@@ -259,12 +262,29 @@ static void init()
 			if (u != cpSpaceGetStaticBody(space))
 				return true;
 
+			if (v == headBody) {
+				head_collision = true;
+				head_collision_started = true;
+				return true;
+			}
+
 			if (v == leftHandBody)
 				left_hand_stop = u;
 			if (v == rightHandBody)
 				right_hand_stop = u;
 
 			return true;
+		};
+
+		handler->separateFunc = [](cpArbiter *arb, cpSpace *space, void *data) {
+			cpBody *u, *v;
+			cpArbiterGetBodies(arb, &u, &v);
+
+			if (u != cpSpaceGetStaticBody(space))
+				return;
+
+			if (v == headBody)
+				head_collision = false;
 		};
 	}
 }
@@ -699,22 +719,24 @@ static void keyboard(SDL_KeyboardEvent *key)
 
 static void update()
 {
-	{
-		static float head_collision;
+	if (head_collision && head_collision_started) {
+		static float force;
 
-		head_collision = 0;
+		force = 0;
 		cpBodyEachArbiter(headBody, [](cpBody *body, cpArbiter *arb, void *data) {
-			head_collision += cpvlength(cpArbiterTotalImpulse(arb));
+			force += cpvlength(cpArbiterTotalImpulse(arb));
 		}, NULL);
 
-		if (head_collision > 0) {
-			if (head_collision > 200.)
+		if (force > 0) {
+			if (force > 200.)
 				Mix_PlayChannel(-1, thud_sample, 0);
-			if (head_collision > 160.)
+			if (force > 160.)
 				Mix_PlayChannel(-1, thudd_sample, 0);
-			if (head_collision > 100.)
+			if (force > 100.)
 				Mix_PlayChannel(-1, thu_sample, 0);
 		}
+
+		head_collision_started = false;
 	}
 
 	if (left_hand_stop || right_hand_stop)
