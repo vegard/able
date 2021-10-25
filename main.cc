@@ -157,15 +157,10 @@ static void init()
 	font_texture = new texture("font.png");
 
 	/* Physics */
-	//cpInitChipmunk();
-
 	space = cpSpaceNew();
 	assert(space);
 
 	cpSpaceSetIterations(space, 100);
-	//cpSpaceSetCollisionBias(space, 0.001);
-
-	//space->gravity = cpv(0, 700);
 	cpSpaceSetGravity(space, cpv(0, 100));
 
 	staticBody = cpSpaceGetStaticBody(space);
@@ -175,7 +170,6 @@ static void init()
 	{
 		cpFloat mass = 1.;
 		cpFloat moment = cpMomentForCircle(mass, 0, head_radius, cpvzero);
-		//cpFloat moment = 100. * cpMomentForCircle(mass, 0, head_radius, cpvzero);
 
 		// head = head
 		headBody = cpSpaceAddBody(space, cpBodyNew(mass, moment));
@@ -217,7 +211,6 @@ static void init()
 
 	{
 		cpFloat mass = .1;
-		//cpFloat moment = cpMomentForCircle(mass, 0, hand_radius, cpvzero);
 		cpFloat moment = INFINITY;
 
 		leftHandBody = cpBodyNew(mass, moment);
@@ -271,11 +264,8 @@ static void draw_sphere(cpVect pos, cpVect rot, float radius)
 	glTranslatef(pos.x, pos.y, 0);
 	glRotatef(360. * atan2(rot.y, rot.x) / 2. / M_PI, 0, 0, 1);
 
-	//glColor4f(0, 0, 0, 1);
 	glBegin(GL_LINES);
 	unsigned int n = 20;
-	//glVertex2f(0, 0);
-	//glVertex2f(0, -radius);
 	for (unsigned int i = 0; i < n; ++i) {
 		float a0 = 1. * i / n * (2. * M_PI);
 		float a1 = 1. * (i + 1) / n * (2. * M_PI);
@@ -481,8 +471,6 @@ static void display()
 	glEnd();
 
 	draw_sphere(head_pos, cpBodyGetRotation(headBody), head_radius);
-	//draw_sphere(left_hand_pos, cpBodyGetRotation(leftHandBody), hand_radius);
-	//draw_sphere(right_hand_pos, cpBodyGetRotation(rightHandBody), hand_radius);
 
 	// draw HUD (timer)
 
@@ -516,7 +504,6 @@ static void display()
 		// font is 48x96 per character
 
 		glColor4f(1, 1, 1, 1);
-
 		glBegin(GL_QUADS);
 
 		for (unsigned int i = n; i > 0; --i) {
@@ -559,25 +546,9 @@ static void display()
 	SDL_GL_SwapWindow(window);
 }
 
-static bool jump = false;
-static double v_x = 0;
-
-static void joystick_axis(SDL_JoyAxisEvent &e)
-{
-	if (e.axis == 0) {
-		v_x = e.value / 250.;
-	}
-}
-
-static void joystick_button_down(SDL_JoyButtonEvent &e)
-{
-	if (e.button == 1)
-		jump = true;
-}
-
 static void release_left()
 {
-	// cut the line
+	// withdraw the hand
 	left_hand_out = false;
 	left_hand_stop = NULL;
 
@@ -598,7 +569,7 @@ static void release_left()
 
 static void release_right()
 {
-	// cut the line
+	// withdraw the hand
 	right_hand_out = false;
 	right_hand_stop = NULL;
 
@@ -708,21 +679,6 @@ static void keyboard(SDL_KeyboardEvent *key)
 			event.type = SDL_QUIT;
 			SDL_PushEvent(&event);
 		}
-		break;
-	default:
-		break;
-	}
-}
-
-static void keyboard_up(SDL_KeyboardEvent *key)
-{
-	switch (key->keysym.sym) {
-
-	case SDLK_LEFT:
-		break;
-	case SDLK_RIGHT:
-		break;
-	case SDLK_UP:
 		break;
 	default:
 		break;
@@ -840,17 +796,8 @@ int main(int argc, char *argv[])
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
-			case SDL_JOYAXISMOTION:
-				joystick_axis(event.jaxis);
-				break;
-			case SDL_JOYBUTTONDOWN:
-				joystick_button_down(event.jbutton);
-				break;
 			case SDL_KEYDOWN:
 				keyboard(&event.key);
-				break;
-			case SDL_KEYUP:
-				keyboard_up(&event.key);
 				break;
 			case SDL_QUIT:
 				running = false;
