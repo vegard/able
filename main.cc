@@ -28,13 +28,13 @@ extern "C" {
 /* Parameters */
 
 static const cpFloat head_radius = 8;
-static const cpFloat hook_radius = 1.;
+static const cpFloat hand_radius = 1.;
 static const cpFloat max_rope_length = 40.;
 
-static const cpFloat hook_velocity = 10.;
+static const cpFloat hand_velocity = 10.;
 
-static const cpFloat hook_stiffness = 50.;
-static const cpFloat hook_damping = 5.;
+static const cpFloat hand_stiffness = 50.;
+static const cpFloat hand_damping = 5.;
 
 static const cpFloat reel_in_velocity = .5;
 static const cpFloat min_rope_length = 5.;
@@ -86,16 +86,16 @@ static cpBody *leftHookBody;
 static cpShape *leftHookShape;
 static cpConstraint *leftHookOutJoint;
 static cpConstraint *leftGripJoint;
-static bool left_hook_out = false;
-static cpBody *left_hook_stop;
+static bool left_hand_out = false;
+static cpBody *left_hand_stop;
 static cpConstraint *leftHookSpring;
 
 static cpBody *rightHookBody;
 static cpShape *rightHookShape;
 static cpConstraint *rightHookOutJoint;
 static cpConstraint *rightGripJoint;
-static bool right_hook_out = false;
-static cpBody *right_hook_stop;
+static bool right_hand_out = false;
+static cpBody *right_hand_stop;
 static cpConstraint *rightHookSpring;
 
 static float camera_x, camera_y;
@@ -217,32 +217,32 @@ static void init()
 
 	{
 		cpFloat mass = .1;
-		//cpFloat moment = cpMomentForCircle(mass, 0, hook_radius, cpvzero);
+		//cpFloat moment = cpMomentForCircle(mass, 0, hand_radius, cpvzero);
 		cpFloat moment = INFINITY;
 
 		leftHookBody = cpBodyNew(mass, moment);
-		cpBodySetPosition(leftHookBody, cpv(160 - head_radius - hook_radius, 100));
+		cpBodySetPosition(leftHookBody, cpv(160 - head_radius - hand_radius, 100));
 
-		leftHookShape = cpCircleShapeNew(leftHookBody, hook_radius, cpvzero);
+		leftHookShape = cpCircleShapeNew(leftHookBody, hand_radius, cpvzero);
 		cpShapeSetElasticity(leftHookShape, 0.);
 		cpShapeSetFriction(leftHookShape, 1.);
 		cpShapeSetCollisionType(leftHookShape, 1);
 		cpShapeSetFilter(leftHookShape, cpShapeFilterNew(1, 1 << CP_CATEGORY_PLAYER, CP_ALL_CATEGORIES));
 
 		rightHookBody = cpBodyNew(mass, moment);
-		cpBodySetPosition(rightHookBody, cpv(160 + head_radius + hook_radius, 100));
+		cpBodySetPosition(rightHookBody, cpv(160 + head_radius + hand_radius, 100));
 
-		rightHookShape = cpCircleShapeNew(rightHookBody, hook_radius, cpvzero);
+		rightHookShape = cpCircleShapeNew(rightHookBody, hand_radius, cpvzero);
 		cpShapeSetElasticity(rightHookShape, 0.);
 		cpShapeSetFriction(rightHookShape, 1.);
 		cpShapeSetCollisionType(rightHookShape, 1);
 		cpShapeSetFilter(rightHookShape, cpShapeFilterNew(1, 1 << CP_CATEGORY_PLAYER, CP_ALL_CATEGORIES));
 	}
 
-	leftHookOutJoint = cpSlideJointNew(headBody, leftHookBody, left_shoulder_offset, cpv(hook_radius, 0), 0., max_rope_length);
+	leftHookOutJoint = cpSlideJointNew(headBody, leftHookBody, left_shoulder_offset, cpv(hand_radius, 0), 0., max_rope_length);
 	leftGripJoint = cpSlideJointNew(headBody, staticBody, left_shoulder_offset, cpv(0, 0), 0., max_rope_length);
 
-	rightHookOutJoint = cpSlideJointNew(headBody, rightHookBody, right_shoulder_offset, cpv(-hook_radius, 0), 0., max_rope_length);
+	rightHookOutJoint = cpSlideJointNew(headBody, rightHookBody, right_shoulder_offset, cpv(-hand_radius, 0), 0., max_rope_length);
 	rightGripJoint = cpSlideJointNew(headBody, staticBody, right_shoulder_offset, cpv(0, 0), 0., max_rope_length);
 
 	{
@@ -255,9 +255,9 @@ static void init()
 				return true;
 
 			if (v == leftHookBody)
-				left_hook_stop = u;
+				left_hand_stop = u;
 			if (v == rightHookBody)
-				right_hook_stop = u;
+				right_hand_stop = u;
 
 			return true;
 		};
@@ -420,17 +420,17 @@ static void display()
 	// we can use two circle equations and set them equal to find potentially two solutions
 	// see https://mathworld.wolfram.com/Circle-CircleIntersection.html
 
-	if (left_hook_out) {
-		cpVect left_hook_pos = cpBodyGetPosition(leftHookBody);
+	if (left_hand_out) {
+		cpVect left_hand_pos = cpBodyGetPosition(leftHookBody);
 		cpVect left_shoulder_pos = cpBodyLocalToWorld(headBody, left_shoulder_offset);
 
-		cpVect delta = cpvsub(left_hook_pos, left_shoulder_pos);
+		cpVect delta = cpvsub(left_hand_pos, left_shoulder_pos);
 		float d2 = cpvlengthsq(delta);
 		float x2 = d2 / 4.;
 
 		if (arm_length * arm_length < x2) {
 			glVertex2f(left_shoulder_pos.x, left_shoulder_pos.y);
-			glVertex2f(left_hook_pos.x, left_hook_pos.y);
+			glVertex2f(left_hand_pos.x, left_hand_pos.y);
 		} else {
 			float y2 = arm_length * arm_length - x2;
 			float x = sqrt(x2);
@@ -445,21 +445,21 @@ static void display()
 			glVertex2f(left_elbow_pos.x, left_elbow_pos.y);
 			// left lower arm
 			glVertex2f(left_elbow_pos.x, left_elbow_pos.y);
-			glVertex2f(left_hook_pos.x, left_hook_pos.y);
+			glVertex2f(left_hand_pos.x, left_hand_pos.y);
 		}
 	}
 
-	if (right_hook_out) {
-		cpVect right_hook_pos = cpBodyGetPosition(rightHookBody);
+	if (right_hand_out) {
+		cpVect right_hand_pos = cpBodyGetPosition(rightHookBody);
 		cpVect right_shoulder_pos = cpBodyLocalToWorld(headBody, right_shoulder_offset);
 
-		cpVect delta = cpvsub(right_hook_pos, right_shoulder_pos);
+		cpVect delta = cpvsub(right_hand_pos, right_shoulder_pos);
 		float d2 = cpvlengthsq(delta);
 		float x2 = d2 / 4.;
 
 		if (arm_length * arm_length < x2) {
 			glVertex2f(right_shoulder_pos.x, right_shoulder_pos.y);
-			glVertex2f(right_hook_pos.x, right_hook_pos.y);
+			glVertex2f(right_hand_pos.x, right_hand_pos.y);
 		} else {
 			float y2 = arm_length * arm_length - x2;
 			float x = sqrt(x2);
@@ -474,15 +474,15 @@ static void display()
 			glVertex2f(right_elbow_pos.x, right_elbow_pos.y);
 			// right lower arm
 			glVertex2f(right_elbow_pos.x, right_elbow_pos.y);
-			glVertex2f(right_hook_pos.x, right_hook_pos.y);
+			glVertex2f(right_hand_pos.x, right_hand_pos.y);
 		}
 	}
 
 	glEnd();
 
 	draw_sphere(head_pos, cpBodyGetRotation(headBody), head_radius);
-	//draw_sphere(left_hook_pos, cpBodyGetRotation(leftHookBody), hook_radius);
-	//draw_sphere(right_hook_pos, cpBodyGetRotation(rightHookBody), hook_radius);
+	//draw_sphere(left_hand_pos, cpBodyGetRotation(leftHookBody), hand_radius);
+	//draw_sphere(right_hand_pos, cpBodyGetRotation(rightHookBody), hand_radius);
 
 	// draw HUD (timer)
 
@@ -578,8 +578,8 @@ static void joystick_button_down(SDL_JoyButtonEvent &e)
 static void release_left()
 {
 	// cut the line
-	left_hook_out = false;
-	left_hook_stop = NULL;
+	left_hand_out = false;
+	left_hand_stop = NULL;
 
 	cpSpaceRemoveConstraint(space, leftHookOutJoint);
 
@@ -599,8 +599,8 @@ static void release_left()
 static void release_right()
 {
 	// cut the line
-	right_hook_out = false;
-	right_hook_stop = NULL;
+	right_hand_out = false;
+	right_hand_stop = NULL;
 
 	cpSpaceRemoveConstraint(space, rightHookOutJoint);
 
@@ -621,10 +621,10 @@ static void keyboard(SDL_KeyboardEvent *key)
 {
 	switch (key->keysym.sym) {
 	case SDLK_q:
-		if (!left_hook_out) {
-			// shoot out left hook
-			left_hook_out = true;
-			left_hook_stop = NULL;
+		if (!left_hand_out) {
+			// shoot out left hand
+			left_hand_out = true;
+			left_hand_stop = NULL;
 
 			cpSpaceAddConstraint(space, leftHookOutJoint);
 
@@ -632,14 +632,14 @@ static void keyboard(SDL_KeyboardEvent *key)
 
 			cpSpaceAddShape(space, leftHookShape);
 
-			//cpBodySetPosition(leftHookBody, cpBodyLocalToWorld(headBody, cpv(-head_radius - hook_radius, 0)));
-			cpBodySetPosition(leftHookBody, cpBodyLocalToWorld(headBody, cpv(-head_radius + 2. * hook_radius, 0)));
+			//cpBodySetPosition(leftHookBody, cpBodyLocalToWorld(headBody, cpv(-head_radius - hand_radius, 0)));
+			cpBodySetPosition(leftHookBody, cpBodyLocalToWorld(headBody, cpv(-head_radius + 2. * hand_radius, 0)));
 			cpBodySetVelocity(leftHookBody, cpBodyGetVelocity(headBody));
 			cpSpaceAddBody(space, leftHookBody);
 
 			cpBodyApplyImpulseAtWorldPoint(leftHookBody,
 				//cpv(-5, 0),
-				cpBodyLocalToWorld(headBody, cpv(-hook_velocity, -hook_velocity)) - cpBodyLocalToWorld(headBody, cpv(0, 0)),
+				cpBodyLocalToWorld(headBody, cpv(-hand_velocity, -hand_velocity)) - cpBodyLocalToWorld(headBody, cpv(0, 0)),
 				head_pos);
 		} else {
 			release_left();
@@ -648,10 +648,10 @@ static void keyboard(SDL_KeyboardEvent *key)
 		break;
 
 	case SDLK_p:
-		if (!right_hook_out) {
-			// shoot out right hook
-			right_hook_out = true;
-			right_hook_stop = NULL;
+		if (!right_hand_out) {
+			// shoot out right hand
+			right_hand_out = true;
+			right_hand_stop = NULL;
 
 			cpSpaceAddConstraint(space, rightHookOutJoint);
 
@@ -659,14 +659,14 @@ static void keyboard(SDL_KeyboardEvent *key)
 
 			cpSpaceAddShape(space, rightHookShape);
 
-			//cpBodySetPosition(rightHookBody, cpBodyLocalToWorld(headBody, cpv(head_radius + hook_radius, 0)));
-			cpBodySetPosition(rightHookBody, cpBodyLocalToWorld(headBody, cpv(head_radius - 2. * hook_radius, 0)));
+			//cpBodySetPosition(rightHookBody, cpBodyLocalToWorld(headBody, cpv(head_radius + hand_radius, 0)));
+			cpBodySetPosition(rightHookBody, cpBodyLocalToWorld(headBody, cpv(head_radius - 2. * hand_radius, 0)));
 			cpBodySetVelocity(rightHookBody, cpBodyGetVelocity(headBody));
 			cpSpaceAddBody(space, rightHookBody);
 
 			cpBodyApplyImpulseAtWorldPoint(rightHookBody,
 				//cpv(5, 0),
-				cpBodyLocalToWorld(headBody, cpv(hook_velocity, -hook_velocity)) - cpBodyLocalToWorld(headBody, cpv(0, 0)),
+				cpBodyLocalToWorld(headBody, cpv(hand_velocity, -hand_velocity)) - cpBodyLocalToWorld(headBody, cpv(0, 0)),
 				head_pos);
 		} else {
 			release_right();
@@ -676,9 +676,9 @@ static void keyboard(SDL_KeyboardEvent *key)
 
 	case SDLK_r:
 		{
-			if (left_hook_out)
+			if (left_hand_out)
 				release_left();
-			if (right_hook_out)
+			if (right_hand_out)
 				release_right();
 
 			//cpVect target_pos = cpv(416, -833);
@@ -733,34 +733,34 @@ static void update()
 {
 	const Uint8 *state = SDL_GetKeyboardState(NULL);
 
-	if (left_hook_stop) {
+	if (left_hand_stop) {
 		cpVect pos = cpBodyGetPosition(leftHookBody);
 		cpSpaceRemoveBody(space, leftHookBody);
 
-		leftHookSpring = cpSpaceAddConstraint(space, cpDampedSpringNew(headBody, left_hook_stop,
-			cpv(-head_radius, 0), cpBodyWorldToLocal(left_hook_stop, pos),
+		leftHookSpring = cpSpaceAddConstraint(space, cpDampedSpringNew(headBody, left_hand_stop,
+			cpv(-head_radius, 0), cpBodyWorldToLocal(left_hand_stop, pos),
 			max_rope_length,
-			hook_stiffness, hook_damping));
+			hand_stiffness, hand_damping));
 
 		cpSlideJointSetAnchorB(leftGripJoint, cpBodyWorldToLocal(staticBody, pos));
 		cpSpaceAddConstraint(space, leftGripJoint);
 
-		left_hook_stop = NULL;
+		left_hand_stop = NULL;
 	}
 
-	if (right_hook_stop) {
+	if (right_hand_stop) {
 		cpVect pos = cpBodyGetPosition(rightHookBody);
 		cpSpaceRemoveBody(space, rightHookBody);
 
-		rightHookSpring = cpSpaceAddConstraint(space, cpDampedSpringNew(headBody, right_hook_stop,
-			cpv(head_radius, 0), cpBodyWorldToLocal(right_hook_stop, pos),
+		rightHookSpring = cpSpaceAddConstraint(space, cpDampedSpringNew(headBody, right_hand_stop,
+			cpv(head_radius, 0), cpBodyWorldToLocal(right_hand_stop, pos),
 			max_rope_length,
-			hook_stiffness, hook_damping));
+			hand_stiffness, hand_damping));
 
 		cpSlideJointSetAnchorB(rightGripJoint, cpBodyWorldToLocal(staticBody, pos));
 		cpSpaceAddConstraint(space, rightGripJoint);
 
-		right_hook_stop = NULL;
+		right_hand_stop = NULL;
 	}
 
 	if (leftHookSpring) {
