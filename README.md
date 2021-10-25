@@ -30,6 +30,11 @@ Requirements:
 * [Chipmunk2D 7.0.3](https://chipmunk-physics.net/)
 
 
+## Disclaimer
+
+This code was written from scratch in a few days for a game jam. In other words, the code quality is poor and should not be taken as an indication of my general programming skill or sense of code aesthetics :-)
+
+
 ## License
 
 This game code is Copyright (C) 2021 Vegard Nossum <vegard.nossum@gmail.com>.
