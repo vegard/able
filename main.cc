@@ -27,7 +27,7 @@ extern "C" {
 
 /* Parameters */
 
-static const cpFloat ball_radius = 8;
+static const cpFloat head_radius = 8;
 static const cpFloat hook_radius = 1.;
 static const cpFloat max_rope_length = 40.;
 
@@ -39,8 +39,8 @@ static const cpFloat hook_damping = 5.;
 static const cpFloat reel_in_velocity = .5;
 static const cpFloat min_rope_length = 5.;
 
-static const cpVect left_shoulder_offset = cpv(-ball_radius, ball_radius);
-static const cpVect right_shoulder_offset = cpv(ball_radius, ball_radius);
+static const cpVect left_shoulder_offset = cpv(-head_radius, head_radius);
+static const cpVect right_shoulder_offset = cpv(head_radius, head_radius);
 
 /* Definitions */
 
@@ -71,7 +71,7 @@ static SDL_GLContext glcontext;
 
 static cpSpace *space;
 static cpBody *staticBody;
-static cpBody *ballBody;
+static cpBody *headBody;
 static cpBody *torso;
 static cpBody *leftUpperLeg;
 static cpBody *rightUpperLeg;
@@ -174,19 +174,19 @@ static void init()
 
 	{
 		cpFloat mass = 1.;
-		cpFloat moment = cpMomentForCircle(mass, 0, ball_radius, cpvzero);
-		//cpFloat moment = 100. * cpMomentForCircle(mass, 0, ball_radius, cpvzero);
+		cpFloat moment = cpMomentForCircle(mass, 0, head_radius, cpvzero);
+		//cpFloat moment = 100. * cpMomentForCircle(mass, 0, head_radius, cpvzero);
 
-		// ball = head
-		ballBody = cpSpaceAddBody(space, cpBodyNew(mass, moment));
-		cpBodySetPosition(ballBody, cpv(160, 80));
+		// head = head
+		headBody = cpSpaceAddBody(space, cpBodyNew(mass, moment));
+		cpBodySetPosition(headBody, cpv(160, 80));
 
-		cpShape *ballShape = cpSpaceAddShape(space, cpCircleShapeNew(ballBody, ball_radius, cpvzero));
-		cpShapeSetElasticity(ballShape, 1.);
-		cpShapeSetFriction(ballShape, 1.);
+		cpShape *headShape = cpSpaceAddShape(space, cpCircleShapeNew(headBody, head_radius, cpvzero));
+		cpShapeSetElasticity(headShape, 1.);
+		cpShapeSetFriction(headShape, 1.);
 
-		balanceConstraint = cpSpaceAddConstraint(space, cpDampedRotarySpringNew(staticBody, ballBody, 0., 1000., 100.));
-		cpShapeSetFilter(ballShape, cpShapeFilterNew(1, 1 << CP_CATEGORY_PLAYER, CP_ALL_CATEGORIES));
+		balanceConstraint = cpSpaceAddConstraint(space, cpDampedRotarySpringNew(staticBody, headBody, 0., 1000., 100.));
+		cpShapeSetFilter(headShape, cpShapeFilterNew(1, 1 << CP_CATEGORY_PLAYER, CP_ALL_CATEGORIES));
 	}
 
 	auto new_ragdoll_part = [](float mass, cpVect pos, float hw, float hh,
@@ -209,7 +209,7 @@ static void init()
 		return body;
 	};
 
-	torso = new_ragdoll_part(1., cpv(160, 95), 8., 10., ballBody, cpv(0, ball_radius), cpv(0, -10.), -.3, .3);
+	torso = new_ragdoll_part(1., cpv(160, 95), 8., 10., headBody, cpv(0, head_radius), cpv(0, -10.), -.3, .3);
 	leftUpperLeg = new_ragdoll_part(.5, cpv(160 - 5, 115), 3., 8., torso, cpv(-5, 10), cpv(0, -8), -.5, .5);
 	rightUpperLeg = new_ragdoll_part(.5, cpv(160 + 5, 115), 3., 8., torso, cpv(5, 10), cpv(0, -8), -.5, .5);
 	leftLowerLeg = new_ragdoll_part(.2, cpv(160 - 5, 123), 2.5, 6., leftUpperLeg, cpv(0, 8), cpv(0, -6), -.5, .5, 1 << CP_CATEGORY_PLAYER);
@@ -221,7 +221,7 @@ static void init()
 		cpFloat moment = INFINITY;
 
 		leftHookBody = cpBodyNew(mass, moment);
-		cpBodySetPosition(leftHookBody, cpv(160 - ball_radius - hook_radius, 100));
+		cpBodySetPosition(leftHookBody, cpv(160 - head_radius - hook_radius, 100));
 
 		leftHookShape = cpCircleShapeNew(leftHookBody, hook_radius, cpvzero);
 		cpShapeSetElasticity(leftHookShape, 0.);
@@ -230,7 +230,7 @@ static void init()
 		cpShapeSetFilter(leftHookShape, cpShapeFilterNew(1, 1 << CP_CATEGORY_PLAYER, CP_ALL_CATEGORIES));
 
 		rightHookBody = cpBodyNew(mass, moment);
-		cpBodySetPosition(rightHookBody, cpv(160 + ball_radius + hook_radius, 100));
+		cpBodySetPosition(rightHookBody, cpv(160 + head_radius + hook_radius, 100));
 
 		rightHookShape = cpCircleShapeNew(rightHookBody, hook_radius, cpvzero);
 		cpShapeSetElasticity(rightHookShape, 0.);
@@ -239,11 +239,11 @@ static void init()
 		cpShapeSetFilter(rightHookShape, cpShapeFilterNew(1, 1 << CP_CATEGORY_PLAYER, CP_ALL_CATEGORIES));
 	}
 
-	leftHookOutJoint = cpSlideJointNew(ballBody, leftHookBody, left_shoulder_offset, cpv(hook_radius, 0), 0., max_rope_length);
-	leftGripJoint = cpSlideJointNew(ballBody, staticBody, left_shoulder_offset, cpv(0, 0), 0., max_rope_length);
+	leftHookOutJoint = cpSlideJointNew(headBody, leftHookBody, left_shoulder_offset, cpv(hook_radius, 0), 0., max_rope_length);
+	leftGripJoint = cpSlideJointNew(headBody, staticBody, left_shoulder_offset, cpv(0, 0), 0., max_rope_length);
 
-	rightHookOutJoint = cpSlideJointNew(ballBody, rightHookBody, right_shoulder_offset, cpv(-hook_radius, 0), 0., max_rope_length);
-	rightGripJoint = cpSlideJointNew(ballBody, staticBody, right_shoulder_offset, cpv(0, 0), 0., max_rope_length);
+	rightHookOutJoint = cpSlideJointNew(headBody, rightHookBody, right_shoulder_offset, cpv(-hook_radius, 0), 0., max_rope_length);
+	rightGripJoint = cpSlideJointNew(headBody, staticBody, right_shoulder_offset, cpv(0, 0), 0., max_rope_length);
 
 	{
 		cpCollisionHandler *handler = cpSpaceAddCollisionHandler(space, 0, 1);
@@ -370,11 +370,11 @@ static void display()
 
 	glTranslatef(-camera_x + 320 / 2, -camera_y + 200 / 2, 0);
 
-	cpVect ball_pos = cpBodyGetPosition(ballBody);
+	cpVect head_pos = cpBodyGetPosition(headBody);
 
 	// Draw level
 
-	cpSpaceBBQuery(space, cpBBNew(ball_pos.x - 160, ball_pos.y - 100, ball_pos.x + 160, ball_pos.y + 100), cpShapeFilterNew(0, 1 << CP_CATEGORY_CAMERA, 1 << CP_CATEGORY_LEVEL), [](cpShape *shape, void *data) {
+	cpSpaceBBQuery(space, cpBBNew(head_pos.x - 160, head_pos.y - 100, head_pos.x + 160, head_pos.y + 100), cpShapeFilterNew(0, 1 << CP_CATEGORY_CAMERA, 1 << CP_CATEGORY_LEVEL), [](cpShape *shape, void *data) {
 		cpBody *body = cpShapeGetBody(shape);
 		if (body != cpSpaceGetStaticBody(space))
 			return;
@@ -385,7 +385,7 @@ static void display()
 
 	}, NULL);
 
-	cpSpaceBBQuery(space, cpBBNew(ball_pos.x - 160, ball_pos.y - 100, ball_pos.x + 160, ball_pos.y + 100), cpShapeFilterNew(0, 1 << CP_CATEGORY_CAMERA, 1 << CP_CATEGORY_LEVEL), [](cpShape *shape, void *data) {
+	cpSpaceBBQuery(space, cpBBNew(head_pos.x - 160, head_pos.y - 100, head_pos.x + 160, head_pos.y + 100), cpShapeFilterNew(0, 1 << CP_CATEGORY_CAMERA, 1 << CP_CATEGORY_LEVEL), [](cpShape *shape, void *data) {
 		cpBody *body = cpShapeGetBody(shape);
 		if (body != cpSpaceGetStaticBody(space))
 			return;
@@ -422,7 +422,7 @@ static void display()
 
 	if (left_hook_out) {
 		cpVect left_hook_pos = cpBodyGetPosition(leftHookBody);
-		cpVect left_shoulder_pos = cpBodyLocalToWorld(ballBody, left_shoulder_offset);
+		cpVect left_shoulder_pos = cpBodyLocalToWorld(headBody, left_shoulder_offset);
 
 		cpVect delta = cpvsub(left_hook_pos, left_shoulder_pos);
 		float d2 = cpvlengthsq(delta);
@@ -451,7 +451,7 @@ static void display()
 
 	if (right_hook_out) {
 		cpVect right_hook_pos = cpBodyGetPosition(rightHookBody);
-		cpVect right_shoulder_pos = cpBodyLocalToWorld(ballBody, right_shoulder_offset);
+		cpVect right_shoulder_pos = cpBodyLocalToWorld(headBody, right_shoulder_offset);
 
 		cpVect delta = cpvsub(right_hook_pos, right_shoulder_pos);
 		float d2 = cpvlengthsq(delta);
@@ -480,7 +480,7 @@ static void display()
 
 	glEnd();
 
-	draw_sphere(ball_pos, cpBodyGetRotation(ballBody), ball_radius);
+	draw_sphere(head_pos, cpBodyGetRotation(headBody), head_radius);
 	//draw_sphere(left_hook_pos, cpBodyGetRotation(leftHookBody), hook_radius);
 	//draw_sphere(right_hook_pos, cpBodyGetRotation(rightHookBody), hook_radius);
 
@@ -628,19 +628,19 @@ static void keyboard(SDL_KeyboardEvent *key)
 
 			cpSpaceAddConstraint(space, leftHookOutJoint);
 
-			cpVect ball_pos = cpBodyGetPosition(ballBody);
+			cpVect head_pos = cpBodyGetPosition(headBody);
 
 			cpSpaceAddShape(space, leftHookShape);
 
-			//cpBodySetPosition(leftHookBody, cpBodyLocalToWorld(ballBody, cpv(-ball_radius - hook_radius, 0)));
-			cpBodySetPosition(leftHookBody, cpBodyLocalToWorld(ballBody, cpv(-ball_radius + 2. * hook_radius, 0)));
-			cpBodySetVelocity(leftHookBody, cpBodyGetVelocity(ballBody));
+			//cpBodySetPosition(leftHookBody, cpBodyLocalToWorld(headBody, cpv(-head_radius - hook_radius, 0)));
+			cpBodySetPosition(leftHookBody, cpBodyLocalToWorld(headBody, cpv(-head_radius + 2. * hook_radius, 0)));
+			cpBodySetVelocity(leftHookBody, cpBodyGetVelocity(headBody));
 			cpSpaceAddBody(space, leftHookBody);
 
 			cpBodyApplyImpulseAtWorldPoint(leftHookBody,
 				//cpv(-5, 0),
-				cpBodyLocalToWorld(ballBody, cpv(-hook_velocity, -hook_velocity)) - cpBodyLocalToWorld(ballBody, cpv(0, 0)),
-				ball_pos);
+				cpBodyLocalToWorld(headBody, cpv(-hook_velocity, -hook_velocity)) - cpBodyLocalToWorld(headBody, cpv(0, 0)),
+				head_pos);
 		} else {
 			release_left();
 		}
@@ -655,19 +655,19 @@ static void keyboard(SDL_KeyboardEvent *key)
 
 			cpSpaceAddConstraint(space, rightHookOutJoint);
 
-			cpVect ball_pos = cpBodyGetPosition(ballBody);
+			cpVect head_pos = cpBodyGetPosition(headBody);
 
 			cpSpaceAddShape(space, rightHookShape);
 
-			//cpBodySetPosition(rightHookBody, cpBodyLocalToWorld(ballBody, cpv(ball_radius + hook_radius, 0)));
-			cpBodySetPosition(rightHookBody, cpBodyLocalToWorld(ballBody, cpv(ball_radius - 2. * hook_radius, 0)));
-			cpBodySetVelocity(rightHookBody, cpBodyGetVelocity(ballBody));
+			//cpBodySetPosition(rightHookBody, cpBodyLocalToWorld(headBody, cpv(head_radius + hook_radius, 0)));
+			cpBodySetPosition(rightHookBody, cpBodyLocalToWorld(headBody, cpv(head_radius - 2. * hook_radius, 0)));
+			cpBodySetVelocity(rightHookBody, cpBodyGetVelocity(headBody));
 			cpSpaceAddBody(space, rightHookBody);
 
 			cpBodyApplyImpulseAtWorldPoint(rightHookBody,
 				//cpv(5, 0),
-				cpBodyLocalToWorld(ballBody, cpv(hook_velocity, -hook_velocity)) - cpBodyLocalToWorld(ballBody, cpv(0, 0)),
-				ball_pos);
+				cpBodyLocalToWorld(headBody, cpv(hook_velocity, -hook_velocity)) - cpBodyLocalToWorld(headBody, cpv(0, 0)),
+				head_pos);
 		} else {
 			release_right();
 		}
@@ -686,9 +686,9 @@ static void keyboard(SDL_KeyboardEvent *key)
 			//cpVect target_pos = cpv(425, -1020);
 			//cpVect target_pos = cpv(425, -1120);
 			cpVect target_pos = cpv(160, 80);
-			cpVect body_pos = cpBodyGetPosition(ballBody);
+			cpVect body_pos = cpBodyGetPosition(headBody);
 
-			for (auto body: { ballBody, torso, leftUpperLeg, rightUpperLeg, leftLowerLeg, rightLowerLeg }) {
+			for (auto body: { headBody, torso, leftUpperLeg, rightUpperLeg, leftLowerLeg, rightLowerLeg }) {
 				cpBodySetPosition(body, target_pos + cpBodyGetPosition(body) - body_pos);
 				cpBodySetVelocity(body, cpv(0, 0));
 				cpBodySetAngle(body, 0);
@@ -737,8 +737,8 @@ static void update()
 		cpVect pos = cpBodyGetPosition(leftHookBody);
 		cpSpaceRemoveBody(space, leftHookBody);
 
-		leftHookSpring = cpSpaceAddConstraint(space, cpDampedSpringNew(ballBody, left_hook_stop,
-			cpv(-ball_radius, 0), cpBodyWorldToLocal(left_hook_stop, pos),
+		leftHookSpring = cpSpaceAddConstraint(space, cpDampedSpringNew(headBody, left_hook_stop,
+			cpv(-head_radius, 0), cpBodyWorldToLocal(left_hook_stop, pos),
 			max_rope_length,
 			hook_stiffness, hook_damping));
 
@@ -752,8 +752,8 @@ static void update()
 		cpVect pos = cpBodyGetPosition(rightHookBody);
 		cpSpaceRemoveBody(space, rightHookBody);
 
-		rightHookSpring = cpSpaceAddConstraint(space, cpDampedSpringNew(ballBody, right_hook_stop,
-			cpv(ball_radius, 0), cpBodyWorldToLocal(right_hook_stop, pos),
+		rightHookSpring = cpSpaceAddConstraint(space, cpDampedSpringNew(headBody, right_hook_stop,
+			cpv(head_radius, 0), cpBodyWorldToLocal(right_hook_stop, pos),
 			max_rope_length,
 			hook_stiffness, hook_damping));
 
@@ -777,7 +777,7 @@ static void update()
 			cpDampedSpringSetRestLength(rightHookSpring, max_rope_length);
 	}
 
-	cpVect pos = cpBodyGetPosition(ballBody);
+	cpVect pos = cpBodyGetPosition(headBody);
 
 	if (!finished && pos.y < -1030 && pos.x > 420 && pos.x < 430) {
 		// yo, good job, you crossed the finish line
