@@ -27,6 +27,7 @@ Requirements:
 * OpenGL
 * [SDL 2](http://www.libsdl.org/)
 * [SDL\_Image 2.0](https://www.libsdl.org/projects/SDL_image/)
+* [SDL\_Mixer 2.0](https://www.libsdl.org/projects/SDL_mixer/)
 * [Chipmunk2D 7.0.3](https://chipmunk-physics.net/)
 
 

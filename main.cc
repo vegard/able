@@ -10,8 +10,10 @@
 
 #ifdef _WIN32
 #include <SDL_image.h>
+#include <SDL_mixer.h>
 #else
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
 #endif
 
 extern "C" {
@@ -100,6 +102,8 @@ static cpConstraint *rightHandSpring;
 
 static float camera_x, camera_y;
 
+/* Assets */
+
 struct texture {
         SDL_Surface *surface;
         GLuint id;
@@ -129,6 +133,11 @@ struct texture {
 };
 
 static texture *font_texture;
+
+static Mix_Chunk *dink_sample;
+static Mix_Chunk *thu_sample;
+static Mix_Chunk *thud_sample;
+static Mix_Chunk *thudd_sample;
 
 static void init()
 {
@@ -180,6 +189,7 @@ static void init()
 		cpShapeSetFriction(headShape, 1.);
 
 		balanceConstraint = cpSpaceAddConstraint(space, cpDampedRotarySpringNew(staticBody, headBody, 0., 1000., 100.));
+		cpShapeSetCollisionType(headShape, 1);
 		cpShapeSetFilter(headShape, cpShapeFilterNew(1, 1 << CP_CATEGORY_PLAYER, CP_ALL_CATEGORIES));
 	}
 
@@ -240,6 +250,7 @@ static void init()
 
 	{
 		cpCollisionHandler *handler = cpSpaceAddCollisionHandler(space, 0, 1);
+
 		handler->beginFunc = [](cpArbiter *arb, cpSpace *space, void *data) -> unsigned char {
 			cpBody *u, *v;
 			cpArbiterGetBodies(arb, &u, &v);
@@ -687,7 +698,26 @@ static void keyboard(SDL_KeyboardEvent *key)
 
 static void update()
 {
-	const Uint8 *state = SDL_GetKeyboardState(NULL);
+	{
+		static float head_collision;
+
+		head_collision = 0;
+		cpBodyEachArbiter(headBody, [](cpBody *body, cpArbiter *arb, void *data) {
+			head_collision += cpvlength(cpArbiterTotalImpulse(arb));
+		}, NULL);
+
+		if (head_collision > 0) {
+			if (head_collision > 200.)
+				Mix_PlayChannel(-1, thud_sample, 0);
+			if (head_collision > 160.)
+				Mix_PlayChannel(-1, thudd_sample, 0);
+			if (head_collision > 100.)
+				Mix_PlayChannel(-1, thu_sample, 0);
+		}
+	}
+
+	if (left_hand_stop || right_hand_stop)
+		Mix_PlayChannel(-1, dink_sample, 0);
 
 	if (left_hand_stop) {
 		cpVect pos = cpBodyGetPosition(leftHandBody);
@@ -718,6 +748,8 @@ static void update()
 
 		right_hand_stop = NULL;
 	}
+
+	const Uint8 *state = SDL_GetKeyboardState(NULL);
 
 	if (leftHandSpring) {
 		if (state[SDL_SCANCODE_W])
@@ -767,8 +799,20 @@ static void update()
 
 int main(int argc, char *argv[])
 {
-	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0)
+	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0)
 		exit(1);
+
+	Mix_Init(0);
+	if (Mix_OpenAudio(44100, AUDIO_S16, 1, 1024) != 0)
+		exit(1);
+
+	// max number of concurrent sounds
+	Mix_AllocateChannels(4);
+
+	dink_sample = Mix_LoadWAV("dink.wav");
+	thu_sample = Mix_LoadWAV("thu.wav");
+	thud_sample = Mix_LoadWAV("thud.wav");
+	thudd_sample = Mix_LoadWAV("thudd.wav");
 
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
@@ -825,6 +869,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	Mix_CloseAudio();
 	SDL_Quit();
 	return 0;
 }
