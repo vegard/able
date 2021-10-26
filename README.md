@@ -30,6 +30,20 @@ Requirements:
 * [SDL\_Mixer 2.0](https://www.libsdl.org/projects/SDL_mixer/)
 * [Chipmunk2D 7.0.3](https://chipmunk-physics.net/)
 
+### Windows
+
+The specific packages and external libraries I used for the Windows build were:
+
+* `g++-mingw-w64-x86-64` (`7.3.0-11ubuntu1+20.2build1`)
+* <https://chipmunk-physics.net/release/Chipmunk-7.x/Chipmunk-7.0.3.tgz>
+* <https://www.libsdl.org/release/SDL2-devel-2.0.16-VC.zip>
+* <https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-2.0.4-VC.zip>
+* <https://www.libsdl.org/projects/SDL_image/release/SDL2_image-2.0.5-win32-x64.zip>
+* <https://software-download.microsoft.com/download/pr/18362.1.190318-1202.19h1_release_WindowsSDK.iso> (Windows SDK)
+* <https://archive.mesa3d.org/mesa-19.3.2.tar.xz> (for OpenGL headers only)
+
+Reach out if you need help building for Windows from Linux. I may be able to provide a Dockerfile that does everything.
+
 
 ## Disclaimer
 
