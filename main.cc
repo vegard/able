@@ -622,6 +622,9 @@ static void release_right()
 
 static void keyboard(SDL_KeyboardEvent *key)
 {
+	if (key->repeat)
+		return;
+
 	switch (key->keysym.sym) {
 	case SDLK_q:
 		if (!left_hand_out) {
