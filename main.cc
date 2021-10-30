@@ -44,6 +44,12 @@ static const cpFloat min_arm_length = 5.;
 static const cpVect left_shoulder_offset = cpv(-head_radius, head_radius);
 static const cpVect right_shoulder_offset = cpv(head_radius, head_radius);
 
+static const cpVect torso_size = cpv(16., 20.);
+static const cpVect upper_leg_size = cpv(6., 16.);
+static const cpVect lower_leg_size = cpv(5., 12.);
+static const cpVect upper_arm_size = cpv(max_arm_length / 2. + 1., 2.);
+static const cpVect lower_arm_size = cpv(max_arm_length / 2. + 1., 2.);
+
 /* Definitions */
 
 enum collision_categories {
@@ -197,10 +203,13 @@ static void init()
 		cpShapeSetFilter(headShape, cpShapeFilterNew(1, 1 << CP_CATEGORY_PLAYER, CP_ALL_CATEGORIES));
 	}
 
-	auto new_ragdoll_part = [](float mass, cpVect pos, float hw, float hh,
+	auto new_ragdoll_part = [](float mass, cpVect pos, cpVect size,
 		cpBody *parent, cpVect parent_anchor, cpVect anchor, float min_rot, float max_rot,
 		unsigned int categories = 0)
 	{
+		float hw = size.x / 2.;
+		float hh = size.y / 2.;
+
 		cpFloat moment = cpMomentForBox(mass, 2 * hw, 2 * hh);
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
 		cpBodySetPosition(body, pos);
@@ -217,11 +226,11 @@ static void init()
 		return body;
 	};
 
-	torso = new_ragdoll_part(1., cpv(160, 95), 8., 10., headBody, cpv(0, head_radius), cpv(0, -10.), -.3, .3);
-	leftUpperLeg = new_ragdoll_part(.5, cpv(160 - 5, 115), 3., 8., torso, cpv(-5, 10), cpv(0, -8), -.5, .5);
-	rightUpperLeg = new_ragdoll_part(.5, cpv(160 + 5, 115), 3., 8., torso, cpv(5, 10), cpv(0, -8), -.5, .5);
-	leftLowerLeg = new_ragdoll_part(.2, cpv(160 - 5, 123), 2.5, 6., leftUpperLeg, cpv(0, 8), cpv(0, -6), -.5, .5, 1 << CP_CATEGORY_PLAYER);
-	rightLowerLeg = new_ragdoll_part(.2, cpv(160 + 5, 123), 2.5, 6., rightUpperLeg, cpv(0, 8), cpv(0, -6), -.5, .5, 1 << CP_CATEGORY_PLAYER);
+	torso = new_ragdoll_part(1., cpv(160, 95), torso_size, headBody, cpv(0, head_radius), cpv(0, -10.), -.3, .3);
+	leftUpperLeg = new_ragdoll_part(.5, cpv(160 - 5, 115), upper_leg_size, torso, cpv(-5, 10), cpv(0, -8), -.5, .5);
+	rightUpperLeg = new_ragdoll_part(.5, cpv(160 + 5, 115), upper_leg_size, torso, cpv(5, 10), cpv(0, -8), -.5, .5);
+	leftLowerLeg = new_ragdoll_part(.2, cpv(160 - 5, 123), lower_leg_size, leftUpperLeg, cpv(0, 8), cpv(0, -6), -.5, .5, 1 << CP_CATEGORY_PLAYER);
+	rightLowerLeg = new_ragdoll_part(.2, cpv(160 + 5, 123), lower_leg_size, rightUpperLeg, cpv(0, 8), cpv(0, -6), -.5, .5, 1 << CP_CATEGORY_PLAYER);
 
 	{
 		cpFloat mass = .1;
@@ -382,6 +391,166 @@ static void drawPolyShapeBody(cpBody *body, cpShape *shape)
 	glPopMatrix();
 }
 
+/* Store a (world) center position + rotation (in radians) of each body part.
+ * This makes it easy enough to draw in a variety of ways later. */
+struct player_draw_data {
+	float head[3];
+	float torso[3];
+	float upper_arm[2][3];
+	float lower_arm[2][3];
+	float upper_leg[2][3];
+	float lower_leg[2][3];
+};
+
+static void save_player_draw_data(struct player_draw_data *dd)
+{
+	auto get_data = [](cpBody *body, float result[3]) {
+		cpVect pos = cpBodyGetPosition(body);
+		result[0] = pos.x;
+		result[1] = pos.y;
+
+		cpVect rot = cpBodyGetRotation(body);
+		result[2] = atan2(rot.y, rot.x);
+	};
+
+	get_data(headBody, dd->head);
+	get_data(torso, dd->torso);
+
+	auto get_line_data = [](cpVect a, cpVect b, float result[3]) {
+		cpVect pos = cpvlerp(a, b, .5);
+		result[0] = pos.x;
+		result[1] = pos.y;
+
+		cpVect delta = b - a;
+		result[2] = atan2(delta.y, delta.x);
+	};
+
+	// rendering the single spring as upper arm + lower arm
+	//
+	// this is a triangle problem where:
+	// - the positions of two vertices are known
+	//   (hence also the length between them)
+	// - the other two sides have known lengths
+	// - we want to find the position of the last vertex
+	//
+	// we can use two circle equations and set them equal to find potentially two solutions
+	// see https://mathworld.wolfram.com/Circle-CircleIntersection.html
+
+	const float arm_length2 = max_arm_length * max_arm_length / 4.;
+
+	{
+		cpVect left_shoulder_pos = cpBodyLocalToWorld(headBody, left_shoulder_offset);
+		cpVect left_hand_pos = left_hand_out ? cpBodyGetPosition(leftHandBody) : left_shoulder_pos;
+		cpVect neutral_elbow_pos = cpBodyLocalToWorld(torso, cpv(-torso_size.x / 2., -torso_size.y / 2.) + cpv(0, max_arm_length / 2.));
+
+		cpVect delta = cpvsub(left_hand_pos, left_shoulder_pos);
+		float d2 = cpvlengthsq(delta);
+		float x2 = d2 / 4.;
+
+		cpVect left_elbow_pos;
+		if (arm_length2 < x2) {
+			left_elbow_pos = cpvlerp(left_shoulder_pos, left_hand_pos, .5);
+		} else {
+			float y2 = arm_length2 - x2;
+			float x = sqrt(x2);
+			float y = sqrt(y2);
+
+			float angle = atan2(delta.y, delta.x);
+
+			left_elbow_pos = left_shoulder_pos + cpvrotate(cpv(x, -y), cpv(cos(angle), sin(angle)));
+		}
+
+		if (d2 < 10.)
+			left_elbow_pos = cpvlerp(neutral_elbow_pos, left_elbow_pos, d2 / 10.);
+
+		get_line_data(left_shoulder_pos, left_elbow_pos, dd->upper_arm[0]);
+		get_line_data(left_elbow_pos, left_hand_pos, dd->lower_arm[0]);
+	}
+
+	{
+		cpVect right_shoulder_pos = cpBodyLocalToWorld(headBody, right_shoulder_offset);
+		cpVect right_hand_pos = right_hand_out ? cpBodyGetPosition(rightHandBody) : right_shoulder_pos;
+		cpVect neutral_elbow_pos = cpBodyLocalToWorld(torso, cpv(torso_size.x / 2., -torso_size.y / 2.) + cpv(0, max_arm_length / 2.));
+
+		cpVect delta = cpvsub(right_hand_pos, right_shoulder_pos);
+		float d2 = cpvlengthsq(delta);
+		float x2 = d2 / 4.;
+
+		cpVect right_elbow_pos;
+		if (arm_length2 < x2) {
+			right_elbow_pos = cpvlerp(right_shoulder_pos, right_hand_pos, .5);
+		} else {
+			float y2 = arm_length2 - x2;
+			float x = sqrt(x2);
+			float y = sqrt(y2);
+
+			float angle = atan2(delta.y, delta.x);
+
+			right_elbow_pos = right_shoulder_pos + cpvrotate(cpv(x, y), cpv(cos(angle), sin(angle)));
+		}
+
+		if (d2 < 10.)
+			right_elbow_pos = cpvlerp(neutral_elbow_pos, right_elbow_pos, d2 / 10.);
+
+		get_line_data(right_shoulder_pos, right_elbow_pos, dd->upper_arm[1]);
+		get_line_data(right_elbow_pos, right_hand_pos, dd->lower_arm[1]);
+	}
+
+	get_data(leftUpperLeg, dd->upper_leg[0]);
+	get_data(rightUpperLeg, dd->upper_leg[1]);
+	get_data(leftLowerLeg, dd->lower_leg[0]);
+	get_data(rightLowerLeg, dd->lower_leg[1]);
+}
+
+static void draw_player(struct player_draw_data *dd)
+{
+	auto draw_part = [](float v[3], cpVect size) {
+		float hw = size.x / 2.;
+		float hh = size.y / 2.;
+
+		glPushMatrix();
+		glTranslatef(v[0], v[1], 0);
+		glRotatef(v[2] * 360. / (2. * M_PI), 0, 0, 1);
+
+		glColor3f(1, 1, 1);
+		glBegin(GL_QUADS);
+		glVertex2f(-hw, -hh);
+		glVertex2f(-hw,  hh);
+		glVertex2f( hw,  hh);
+		glVertex2f( hw, -hh);
+		glEnd();
+
+		glColor3f(0, 0, 0);
+		glBegin(GL_LINES);
+		glVertex2f(-hw, -hh);
+		glVertex2f(-hw,  hh);
+		glVertex2f( hw, -hh);
+		glVertex2f( hw,  hh);
+		glVertex2f(-hw, -hh);
+		glVertex2f( hw, -hh);
+		glVertex2f(-hw,  hh);
+		glVertex2f( hw,  hh);
+		glEnd();
+
+		glPopMatrix();
+	};
+
+	//draw_part(dd->head, cpv(2. * head_radius, 2. * head_radius));
+
+	glColor3f(0, 0, 0);
+	draw_sphere(cpv(dd->head[0], dd->head[1]), cpv(0, 1), head_radius);
+
+	draw_part(dd->torso, torso_size);
+	draw_part(dd->lower_leg[0], lower_leg_size);
+	draw_part(dd->lower_leg[1], lower_leg_size);
+	draw_part(dd->upper_leg[0], upper_leg_size);
+	draw_part(dd->upper_leg[1], upper_leg_size);
+	draw_part(dd->lower_arm[0], lower_arm_size);
+	draw_part(dd->lower_arm[1], lower_arm_size);
+	draw_part(dd->upper_arm[0], upper_arm_size);
+	draw_part(dd->upper_arm[1], upper_arm_size);
+}
+
 static void display()
 {
 	glDisable(GL_TEXTURE_2D);
@@ -420,89 +589,12 @@ static void display()
 
 	// Draw player
 
-	for (auto shape: player_shapes) {
-		cpBody *body = cpShapeGetBody(shape);
-		drawPolyShapeBody(body, shape);
+	{
+		struct player_draw_data dd;
+		save_player_draw_data(&dd);
+
+		draw_player(&dd);
 	}
-
-	glColor3f(0, 0, 0);
-
-	const float arm_length = max_arm_length / 2.;
-
-	glBegin(GL_LINES);
-
-	// rendering the single spring as upper arm + lower arm
-	//
-	// this is a triangle problem where:
-	// - the positions of two vertices are known
-	//   (hence also the length between them)
-	// - the other two sides have known lengths
-	// - we want to find the position of the last vertex
-	//
-	// we can use two circle equations and set them equal to find potentially two solutions
-	// see https://mathworld.wolfram.com/Circle-CircleIntersection.html
-
-	if (left_hand_out) {
-		cpVect left_hand_pos = cpBodyGetPosition(leftHandBody);
-		cpVect left_shoulder_pos = cpBodyLocalToWorld(headBody, left_shoulder_offset);
-
-		cpVect delta = cpvsub(left_hand_pos, left_shoulder_pos);
-		float d2 = cpvlengthsq(delta);
-		float x2 = d2 / 4.;
-
-		if (arm_length * arm_length < x2) {
-			glVertex2f(left_shoulder_pos.x, left_shoulder_pos.y);
-			glVertex2f(left_hand_pos.x, left_hand_pos.y);
-		} else {
-			float y2 = arm_length * arm_length - x2;
-			float x = sqrt(x2);
-			float y = sqrt(y2);
-
-			float angle = atan2(delta.y, delta.x);
-
-			cpVect left_elbow_pos = left_shoulder_pos + cpvrotate(cpv(x, -y), cpv(cos(angle), sin(angle)));
-
-			// left upper arm
-			glVertex2f(left_shoulder_pos.x, left_shoulder_pos.y);
-			glVertex2f(left_elbow_pos.x, left_elbow_pos.y);
-			// left lower arm
-			glVertex2f(left_elbow_pos.x, left_elbow_pos.y);
-			glVertex2f(left_hand_pos.x, left_hand_pos.y);
-		}
-	}
-
-	if (right_hand_out) {
-		cpVect right_hand_pos = cpBodyGetPosition(rightHandBody);
-		cpVect right_shoulder_pos = cpBodyLocalToWorld(headBody, right_shoulder_offset);
-
-		cpVect delta = cpvsub(right_hand_pos, right_shoulder_pos);
-		float d2 = cpvlengthsq(delta);
-		float x2 = d2 / 4.;
-
-		if (arm_length * arm_length < x2) {
-			glVertex2f(right_shoulder_pos.x, right_shoulder_pos.y);
-			glVertex2f(right_hand_pos.x, right_hand_pos.y);
-		} else {
-			float y2 = arm_length * arm_length - x2;
-			float x = sqrt(x2);
-			float y = sqrt(y2);
-
-			float angle = atan2(delta.y, delta.x);
-
-			cpVect right_elbow_pos = right_shoulder_pos + cpvrotate(cpv(x, y), cpv(cos(angle), sin(angle)));
-
-			// right upper arm
-			glVertex2f(right_shoulder_pos.x, right_shoulder_pos.y);
-			glVertex2f(right_elbow_pos.x, right_elbow_pos.y);
-			// right lower arm
-			glVertex2f(right_elbow_pos.x, right_elbow_pos.y);
-			glVertex2f(right_hand_pos.x, right_hand_pos.y);
-		}
-	}
-
-	glEnd();
-
-	draw_sphere(head_pos, cpBodyGetRotation(headBody), head_radius);
 
 	// draw HUD (timer)
 
