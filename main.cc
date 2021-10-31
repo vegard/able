@@ -66,6 +66,24 @@ struct shape_user_data {
 	unsigned int nr_verts;
 };
 
+/* Store a (world) center position + rotation (in radians) of each body part.
+ * This makes it easy enough to draw in a variety of ways later.
+ *
+ * NOTE: this is also the on-disk format, so you if you change it you need to
+ * rename the struct to _v1 and bump the version number in read_recording()
+ * + write_recording().
+ *
+ * TODO: We should probably not serialize floats like this...
+ */
+struct player_draw_data {
+	float head[3];
+	float torso[3];
+	float upper_arm[2][3];
+	float lower_arm[2][3];
+	float upper_leg[2][3];
+	float lower_leg[2][3];
+};
+
 /* Runtime state */
 
 static bool finished;
@@ -111,6 +129,9 @@ static bool head_collision_started;
 
 static float camera_x, camera_y;
 
+static std::vector<struct player_draw_data> recording;
+static std::vector<struct player_draw_data> current_recording;
+
 /* Assets */
 
 struct texture {
@@ -147,6 +168,61 @@ static Mix_Chunk *dink_sample;
 static Mix_Chunk *thu_sample;
 static Mix_Chunk *thud_sample;
 static Mix_Chunk *thudd_sample;
+
+static const char *pb_filename = "pb.rec";
+
+void read_recording(const char *filename, std::vector<struct player_draw_data> &result)
+{
+	FILE *fp = fopen(filename, "rb");
+	if (!fp)
+		return;
+
+	uint32_t version;
+	if (fread(&version, sizeof(version), 1, fp) != 1)
+		goto out_close;
+
+	result.clear();
+
+	if (version == 1) {
+		while (!feof(fp)) {
+			struct player_draw_data dd;
+			if (fread(&dd, sizeof(dd), 1, fp) != 1)
+				goto out_close;
+
+			result.push_back(dd);
+		}
+	}
+
+out_close:
+	fclose(fp);
+}
+
+void write_recording(const char *filename, std::vector<struct player_draw_data> &recording)
+{
+	static const char *tmp_filename = ".tmp.rec";
+
+	FILE *fp = fopen(tmp_filename, "wb");
+	if (!fp)
+		return;
+
+	uint32_t version = 1;
+	if (fwrite(&version, sizeof(version), 1, fp) != 1)
+		goto out_close;
+
+	for (struct player_draw_data &dd: recording) {
+		if (fwrite(&dd, sizeof(dd), 1, fp) != 1)
+			goto out_close;
+	}
+
+	fclose(fp);
+	rename(tmp_filename, filename);
+	return;
+
+out_close:
+	fclose(fp);
+}
+
+/* Game logic */
 
 static void init()
 {
@@ -391,17 +467,6 @@ static void drawPolyShapeBody(cpBody *body, cpShape *shape)
 	glPopMatrix();
 }
 
-/* Store a (world) center position + rotation (in radians) of each body part.
- * This makes it easy enough to draw in a variety of ways later. */
-struct player_draw_data {
-	float head[3];
-	float torso[3];
-	float upper_arm[2][3];
-	float lower_arm[2][3];
-	float upper_leg[2][3];
-	float lower_leg[2][3];
-};
-
 static void save_player_draw_data(struct player_draw_data *dd)
 {
 	auto get_data = [](cpBody *body, float result[3]) {
@@ -502,9 +567,9 @@ static void save_player_draw_data(struct player_draw_data *dd)
 	get_data(rightLowerLeg, dd->lower_leg[1]);
 }
 
-static void draw_player(struct player_draw_data *dd)
+static void draw_player(struct player_draw_data *dd, float alpha)
 {
-	auto draw_part = [](float v[3], cpVect size) {
+	auto draw_part = [alpha](float v[3], cpVect size) {
 		float hw = size.x / 2.;
 		float hh = size.y / 2.;
 
@@ -520,7 +585,7 @@ static void draw_player(struct player_draw_data *dd)
 		glVertex2f( hw, -hh);
 		glEnd();
 
-		glColor3f(0, 0, 0);
+		glColor4f(0, 0, 0, alpha);
 		glBegin(GL_LINES);
 		glVertex2f(-hw, -hh);
 		glVertex2f(-hw,  hh);
@@ -537,7 +602,7 @@ static void draw_player(struct player_draw_data *dd)
 
 	//draw_part(dd->head, cpv(2. * head_radius, 2. * head_radius));
 
-	glColor3f(0, 0, 0);
+	glColor4f(0, 0, 0, alpha);
 	draw_sphere(cpv(dd->head[0], dd->head[1]), cpv(0, 1), head_radius);
 
 	draw_part(dd->torso, torso_size);
@@ -587,13 +652,22 @@ static void display()
 
 	}, NULL);
 
-	// Draw player
+	// Draw ghost player
+	if (recording.size() > 0) {
+		unsigned int frame = current_recording.size();
+		if (frame >= recording.size())
+			frame = recording.size() - 1;
 
+		draw_player(&recording[frame], .2);
+	}
+
+	// Draw player
 	{
 		struct player_draw_data dd;
 		save_player_draw_data(&dd);
+		current_recording.push_back(dd);
 
-		draw_player(&dd);
+		draw_player(&dd, 1.);
 	}
 
 	// draw HUD (timer)
@@ -781,8 +855,8 @@ static void keyboard(SDL_KeyboardEvent *key)
 
 			//cpVect target_pos = cpv(416, -833);
 			//cpVect target_pos = cpv(416, -953);
-			//cpVect target_pos = cpv(425, -1020);
-			//cpVect target_pos = cpv(425, -1120);
+			//cpVect target_pos = cpv(425, -1020); // before finishing
+			//cpVect target_pos = cpv(425, -1120); // after finishing
 			cpVect target_pos = cpv(160, 80);
 			cpVect body_pos = cpBodyGetPosition(headBody);
 
@@ -795,8 +869,19 @@ static void keyboard(SDL_KeyboardEvent *key)
 
 			timer_start = SDL_GetTicks();
 			finished = false;
+
+			current_recording.clear();
 		}
 		break;
+
+#if 0 // manual save recording
+	case SDLK_f:
+		if (recording.empty() || current_recording.size() < recording.size()) {
+			current_recording.swap(recording);
+			current_recording.clear();
+		}
+		break;
+#endif
 
 	case SDLK_UP:
 		break;
@@ -890,8 +975,17 @@ static void update()
 		finished = true;
 		finished_time = SDL_GetTicks();
 
+		// Write out new recording
+		write_recording(pb_filename, current_recording);
+
+		if (recording.empty() || current_recording.size() < recording.size()) {
+			current_recording.swap(recording);
+			current_recording.clear();
+		}
+
 		cpSpaceSetGravity(space, cpv(0, 0));
-		cpSpaceRemoveConstraint(space, balanceConstraint);
+		if (cpSpaceContainsConstraint(space, balanceConstraint))
+			cpSpaceRemoveConstraint(space, balanceConstraint);
 
 		// turn off collisions for the player
 		for (auto shape: player_shapes)
@@ -917,6 +1011,8 @@ static void update()
 
 int main(int argc, char *argv[])
 {
+	read_recording(pb_filename, recording);
+
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0)
 		exit(1);
 
