@@ -1,5 +1,27 @@
 {
 static const cpVect verts[5] = {
+	cpv(448.264430, -321.229040),
+	cpv(450.509500, -302.145990),
+	cpv(440.687350, -292.604480),
+	cpv(437.319730, -331.612480),
+	cpv(448.264430, -321.229040),
+};
+static shape_user_data user_data = {
+	.color = { 179, 179, 179 },
+	.filled = true,
+	.verts = verts,
+	.nr_verts = 5,
+};
+cpShape *level = cpPolyShapeNew(staticBody, 5, verts, cpTransformIdentity, 0);
+cpShapeSetElasticity(level, .2);
+cpShapeSetFriction(level, 1.);
+cpShapeSetCollisionType(level, 0);
+cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+cpShapeSetUserData(level, &user_data);
+cpSpaceAddShape(space, level);
+}
+{
+static const cpVect verts[5] = {
 	cpv(64.558333, 80.408330),
 	cpv(61.118749, 135.706250),
 	cpv(83.608332, 135.970830),
