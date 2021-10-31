@@ -224,33 +224,8 @@ out_close:
 
 /* Game logic */
 
-static void init()
+static void game_init()
 {
-	/* Graphics */
-	glEnable(GL_TEXTURE_2D);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	glEnable(GL_POLYGON_SMOOTH);
-	glLineWidth(2);
-
-	glEnable(GL_MULTISAMPLE);
-
-	glClearColor(0, 0, 0, 0);
-	glClearDepth(1.0f);
-
-	glViewport(0, 0, 4 * 320, 4 * 200);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluOrtho2D(0, 320, 200, 0);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	font_texture = new texture("font.png");
-
 	/* Physics */
 	space = cpSpaceNew();
 	assert(space);
@@ -372,6 +347,36 @@ static void init()
 				head_collision = false;
 		};
 	}
+}
+
+static void init()
+{
+	/* Graphics */
+	glEnable(GL_TEXTURE_2D);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glEnable(GL_POLYGON_SMOOTH);
+	glLineWidth(2);
+
+	glEnable(GL_MULTISAMPLE);
+
+	glClearColor(0, 0, 0, 0);
+	glClearDepth(1.0f);
+
+	glViewport(0, 0, 4 * 320, 4 * 200);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(0, 320, 200, 0);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	font_texture = new texture("font.png");
+
+	game_init();
 }
 
 static void draw_sphere(cpVect pos, cpVect rot, float radius)
@@ -871,6 +876,9 @@ static void keyboard(SDL_KeyboardEvent *key)
 			finished = false;
 
 			current_recording.clear();
+
+			// TODO: free old game state
+			game_init();
 		}
 		break;
 
