@@ -663,7 +663,7 @@ static void display()
 		if (frame >= recording.size())
 			frame = recording.size() - 1;
 
-		draw_player(&recording[frame], .2);
+		draw_player(&recording[frame], .1);
 	}
 
 	// Draw player
