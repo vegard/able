@@ -164,6 +164,17 @@ struct texture {
 
 static texture *font_texture;
 
+static texture *head_texture;
+static texture *torso_texture;
+static texture *right_upper_arm_texture;
+static texture *right_lower_arm_texture;
+static texture *left_upper_arm_texture;
+static texture *left_lower_arm_texture;
+static texture *right_upper_leg_texture;
+static texture *right_lower_leg_texture;
+static texture *left_upper_leg_texture;
+static texture *left_lower_leg_texture;
+
 static Mix_Chunk *dink_sample;
 static Mix_Chunk *thu_sample;
 static Mix_Chunk *thud_sample;
@@ -375,6 +386,16 @@ static void init()
 	glLoadIdentity();
 
 	font_texture = new texture("font.png");
+	head_texture = new texture("sprites/head.png");
+	torso_texture = new texture("sprites/torso.png");
+	right_upper_arm_texture = new texture("sprites/right_upper_arm.png");
+	right_lower_arm_texture = new texture("sprites/right_lower_arm.png");
+	left_upper_arm_texture = new texture("sprites/left_upper_arm.png");
+	left_lower_arm_texture = new texture("sprites/left_lower_arm.png");
+	right_upper_leg_texture = new texture("sprites/right_upper_leg.png");
+	right_lower_leg_texture = new texture("sprites/right_lower_leg.png");
+	left_upper_leg_texture = new texture("sprites/left_upper_leg.png");
+	left_lower_leg_texture = new texture("sprites/left_lower_leg.png");
 
 	game_init();
 }
@@ -574,6 +595,43 @@ static void save_player_draw_data(struct player_draw_data *dd)
 
 static void draw_player(struct player_draw_data *dd, float alpha)
 {
+	auto draw_part_tex = [alpha](float v[3], texture *tex) {
+		float hw = tex->surface->w / 4. / 2. / 2.;
+		float hh = tex->surface->h / 4. / 2. / 2.;
+
+		tex->bind();
+
+		glPushMatrix();
+		glTranslatef(v[0], v[1], 0);
+		glRotatef(v[2] * 360. / (2. * M_PI), 0, 0, 1);
+
+		glColor4f(1, 1, 1, alpha);
+		glBegin(GL_QUADS);
+		glTexCoord2f(0., 0.); glVertex2f(-hw, -hh);
+		glTexCoord2f(0., 1.); glVertex2f(-hw,  hh);
+		glTexCoord2f(1., 1.); glVertex2f( hw,  hh);
+		glTexCoord2f(1., 0.); glVertex2f( hw, -hh);
+		glEnd();
+
+		glPopMatrix();
+	};
+
+	glEnable(GL_TEXTURE_2D);
+
+	draw_part_tex(dd->head, head_texture);
+	draw_part_tex(dd->torso, torso_texture);
+
+	draw_part_tex(dd->lower_leg[0], right_lower_leg_texture);
+	draw_part_tex(dd->upper_leg[0], right_upper_leg_texture);
+	draw_part_tex(dd->lower_leg[1], left_lower_leg_texture);
+	draw_part_tex(dd->upper_leg[1], left_upper_leg_texture);
+
+	draw_part_tex(dd->lower_arm[0], right_lower_arm_texture);
+	draw_part_tex(dd->upper_arm[0], right_upper_arm_texture);
+	draw_part_tex(dd->lower_arm[1], left_lower_arm_texture);
+	draw_part_tex(dd->upper_arm[1], left_upper_arm_texture);
+
+#if 0
 	auto draw_part = [alpha](float v[3], cpVect size) {
 		float hw = size.x / 2.;
 		float hh = size.y / 2.;
@@ -605,20 +663,25 @@ static void draw_player(struct player_draw_data *dd, float alpha)
 		glPopMatrix();
 	};
 
+	glDisable(GL_TEXTURE_2D);
+
 	//draw_part(dd->head, cpv(2. * head_radius, 2. * head_radius));
 
 	glColor4f(0, 0, 0, alpha);
 	draw_sphere(cpv(dd->head[0], dd->head[1]), cpv(0, 1), head_radius);
 
 	draw_part(dd->torso, torso_size);
+
 	draw_part(dd->lower_leg[0], lower_leg_size);
-	draw_part(dd->lower_leg[1], lower_leg_size);
 	draw_part(dd->upper_leg[0], upper_leg_size);
+	draw_part(dd->lower_leg[1], lower_leg_size);
 	draw_part(dd->upper_leg[1], upper_leg_size);
+
 	draw_part(dd->lower_arm[0], lower_arm_size);
-	draw_part(dd->lower_arm[1], lower_arm_size);
 	draw_part(dd->upper_arm[0], upper_arm_size);
+	draw_part(dd->lower_arm[1], lower_arm_size);
 	draw_part(dd->upper_arm[1], upper_arm_size);
+#endif
 }
 
 static void display()
