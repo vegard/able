@@ -235,6 +235,58 @@ out_close:
 
 /* Game logic */
 
+static void read_level(const char *path)
+{
+	FILE *fp = fopen(path, "rb");
+	if (!fp)
+		exit(1);
+
+	uint32_t nr_polygons = 0;
+	if (fread(&nr_polygons, sizeof(nr_polygons), 1, fp) != 1)
+		exit(1);
+
+	struct shape_user_data *all_user_data = new struct shape_user_data[nr_polygons];
+	for (unsigned int i = 0; i < nr_polygons; ++i) {
+		struct shape_user_data *user_data = &all_user_data[i];
+
+		if (fread(user_data->color, sizeof(*user_data->color), 4, fp) != 4)
+			exit(1);
+
+		uint32_t filled = 0;
+		if (fread(&filled, sizeof(filled), 1, fp) != 1)
+			exit(1);
+
+		user_data->filled = filled;
+
+		uint32_t nr_verts = 0;
+		if (fread(&nr_verts, sizeof(nr_verts), 1, fp) != 1)
+			exit(1);
+
+		user_data->nr_verts = nr_verts;
+
+		cpVect *verts = new cpVect[nr_verts];
+		for (unsigned int j = 0; j < nr_verts; ++j) {
+			float x[2];
+			if (fread(x, sizeof(*x), 2, fp) != 2)
+				exit(1);
+
+			verts[j] = cpv(x[0], x[1]);
+		}
+
+		user_data->verts = verts;
+
+		cpShape *level = cpPolyShapeNew(staticBody, nr_verts, verts, cpTransformIdentity, 0);
+		cpShapeSetElasticity(level, .2);
+		cpShapeSetFriction(level, 1.);
+		cpShapeSetCollisionType(level, 0);
+		cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+		cpShapeSetUserData(level, user_data);
+		cpSpaceAddShape(space, level);
+	}
+
+	fclose(fp);
+}
+
 static void game_init()
 {
 	/* Physics */
@@ -246,7 +298,7 @@ static void game_init()
 
 	staticBody = cpSpaceGetStaticBody(space);
 
-#include "level.c"
+	read_level("level.dat");
 
 	{
 		cpFloat mass = 1.;

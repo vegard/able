@@ -1,6 +1,7 @@
 # coding=utf-8
 
 import os
+import struct
 import sys
 import re
 from math import sqrt
@@ -173,23 +174,12 @@ for path in doc.getElementsByTagName('path'):
 
     save_polygon()
 
-for label, color, points in polygons:
-    print "{"
-    print "static const cpVect verts[%u] = {" % (len(points), )
-    for x, y in points:
-        print "\tcpv(%f, %f)," % (x, y - 97)
-    print "};"
-    print "static shape_user_data user_data = {"
-    print "\t.color = { %u, %u, %u }," % color
-    print "\t.filled = %s," % ('true' if label == 'Geometry' else 'false')
-    print "\t.verts = verts,"
-    print "\t.nr_verts = %u," % (len(points), )
-    print "};"
-    print "cpShape *level = cpPolyShapeNew(staticBody, %u, verts, cpTransformIdentity, 0);" % (len(points), )
-    print "cpShapeSetElasticity(level, .2);"
-    print "cpShapeSetFriction(level, 1.);"
-    print "cpShapeSetCollisionType(level, 0);"
-    print "cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));"
-    print "cpShapeSetUserData(level, &user_data);"
-    print "cpSpaceAddShape(space, level);"
-    print "}"
+with open('level.dat', 'wb') as f:
+    f.write(struct.pack('<i', len(polygons)))
+
+    for label, color, points in polygons:
+        f.write(struct.pack('<ffff', *(color + (0, ))))
+        f.write(struct.pack('<i', int(label == 'Geometry')))
+        f.write(struct.pack('<i', len(points)))
+        for x, y in points:
+            f.write(struct.pack('<ff', x, y - 97))
