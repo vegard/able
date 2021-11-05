@@ -2,6 +2,10 @@
 #include <windows.h>
 #endif
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten/emscripten.h>
+#endif
+
 #include <cassert>
 #include <cstdio>
 #include <vector>
@@ -21,7 +25,7 @@ extern "C" {
 #include <GL/glu.h>
 }
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__EMSCRIPTEN__)
 #include <chipmunk/chipmunk.h>
 #else
 #include <chipmunk.h>
@@ -142,31 +146,40 @@ struct level {
 struct level *level;
 
 struct texture {
-        SDL_Surface *surface;
-        GLuint id;
+	SDL_Surface *surface;
+	GLuint id;
 
-        texture(const char *filename)
-        {
-                surface = IMG_Load(filename);
+	texture(const char *filename)
+	{
+		surface = IMG_Load(filename);
 		if (!surface) {
 			fprintf(stderr, "IMG_Load(): %s\n", IMG_GetError());
 			exit(1);
 		}
 
-                glGenTextures(1, &id);
-                glBindTexture(GL_TEXTURE_2D, id);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-                glTexImage2D(GL_TEXTURE_2D, 0,
-                        surface->format->BytesPerPixel,
-                        surface->w, surface->h, 0,
-                        GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
-        }
+		glGenTextures(1, &id);
+		glBindTexture(GL_TEXTURE_2D, id);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-        void bind()
-        {
-                glBindTexture(GL_TEXTURE_2D, id);
-        }
+		GLint internalformat;
+		if (surface->format->BytesPerPixel == 3)
+			internalformat = GL_RGB;
+		else if (surface->format->BytesPerPixel == 4)
+			internalformat = GL_RGBA;
+
+		glTexImage2D(GL_TEXTURE_2D, 0,
+			internalformat,
+			surface->w, surface->h, 0,
+			GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+	}
+
+	void bind()
+	{
+		glBindTexture(GL_TEXTURE_2D, id);
+	}
 };
 
 static texture *font_texture;
@@ -451,7 +464,11 @@ static void init()
 	glClearColor(0, 0, 0, 0);
 	glClearDepth(1.0f);
 
-	glViewport(0, 0, 4 * 320, 4 * 200);
+	{
+		int w, h;
+		SDL_GetWindowSize(window, &w, &h);
+		glViewport(0, 0, w, h);
+	}
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -1201,6 +1218,25 @@ static void update()
 	}
 }
 
+#ifdef __EMSCRIPTEN__
+void main_loop_fn(void *arg)
+{
+	SDL_Event event;
+	while (SDL_PollEvent(&event)) {
+		switch (event.type) {
+		case SDL_KEYDOWN:
+			keyboard(&event.key);
+			break;
+		default:
+			break;
+		}
+	}
+
+	update();
+	display();
+}
+#endif
+
 int main(int argc, char *argv[])
 {
 	level = read_level("assets/level.dat");
@@ -1224,7 +1260,14 @@ int main(int argc, char *argv[])
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 
-	window = SDL_CreateWindow("Able", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 4 * 320, 4 * 200, SDL_WINDOW_OPENGL);
+#ifdef __EMSCRIPTEN__
+	// play smaller in the browser for performance reasons
+	unsigned int scale = 3;
+#else
+	unsigned int scale = 4;
+#endif
+
+	window = SDL_CreateWindow("Able", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, scale * 320, scale * 200, SDL_WINDOW_OPENGL);
 	if (!window) {
 		fprintf(stderr, "SDL_CreateWindow() failed\n");
 		exit(1);
@@ -1251,6 +1294,9 @@ int main(int argc, char *argv[])
 
 	timer_start = SDL_GetTicks();
 
+#ifdef __EMSCRIPTEN__
+	emscripten_set_main_loop_arg(main_loop_fn, NULL, 60, 1);
+#else
 	Uint64 frame_start = SDL_GetPerformanceCounter();
 
 	bool running = true;
@@ -1292,5 +1338,6 @@ int main(int argc, char *argv[])
 
 	Mix_CloseAudio();
 	SDL_Quit();
+#endif
 	return 0;
 }

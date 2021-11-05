@@ -1,0 +1,47 @@
+FROM ubuntu:impish AS build-stage
+
+RUN apt-get update
+RUN apt-get install -y emscripten
+RUN apt-get install -y wget
+
+WORKDIR /root
+
+#
+# Libraries
+#
+
+# Chipmunk 2D for physics
+RUN wget https://chipmunk-physics.net/release/Chipmunk-7.x/Chipmunk-7.0.3.tgz
+
+RUN apt-get install -y unzip
+
+RUN tar xzvf Chipmunk-7.0.3.tgz
+
+
+#
+# Build it!
+#
+
+ADD assets assets
+ADD sounds sounds
+ADD sprites sprites
+ADD emscripten emscripten
+ADD main.cc .
+
+RUN em++
+RUN em++ --embed-file assets --embed-file sounds --embed-file sprites -O3 -DNDEBUG -s LEGACY_GL_EMULATION=1 -s GL_FFP_ONLY=1 -s USE_SDL=2 -s USE_SDL_MIXER=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='["png"]' -IChipmunk-7.0.3/include -o main.html --shell-file emscripten/shell.html main.cc Chipmunk-7.0.3/src/*.c 2>&1 | tee output.txt
+
+
+#
+# Generate output archive
+#
+
+RUN apt-get install -y zip
+
+RUN mkdir able
+RUN cp main.html able/index.html
+RUN cp main.js main.wasm able/
+RUN cd able && zip -r ../able-web.zip ./
+
+FROM scratch AS export-stage
+COPY --from=build-stage /root/able-web.zip /
