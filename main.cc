@@ -460,7 +460,7 @@ static void init()
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	font_texture = new texture("font.png");
+	font_texture = new texture("assets/font.png");
 	head_texture = new texture("sprites/head.png");
 	torso_texture = new texture("sprites/torso.png");
 	right_upper_arm_texture = new texture("sprites/right_upper_arm.png");
@@ -1203,7 +1203,7 @@ static void update()
 
 int main(int argc, char *argv[])
 {
-	level = read_level("level.dat");
+	level = read_level("assets/level.dat");
 	read_recording(pb_filename, recording);
 
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER) != 0)
@@ -1216,10 +1216,10 @@ int main(int argc, char *argv[])
 	// max number of concurrent sounds
 	Mix_AllocateChannels(4);
 
-	dink_sample = Mix_LoadWAV("dink.wav");
-	thu_sample = Mix_LoadWAV("thu.wav");
-	thud_sample = Mix_LoadWAV("thud.wav");
-	thudd_sample = Mix_LoadWAV("thudd.wav");
+	dink_sample = Mix_LoadWAV("sounds/dink.wav");
+	thu_sample = Mix_LoadWAV("sounds/thu.wav");
+	thud_sample = Mix_LoadWAV("sounds/thud.wav");
+	thudd_sample = Mix_LoadWAV("sounds/thudd.wav");
 
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);

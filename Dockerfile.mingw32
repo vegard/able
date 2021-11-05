@@ -84,8 +84,10 @@ RUN apt-get install -y g++-mingw-w64-x86-64
 # Build it!
 #
 
-ADD *.wav *.png ./
-ADD *.cc *.c ./
+ADD assets assets
+ADD sounds sounds
+ADD sprites sprites
+ADD main.cc .
 
 # OMG... gcc won't be able to find this unless the suffix is all-lowercase
 RUN cd "Program Files/Windows Kits/10/Lib/10.0.18362.0/um/x64/" && cp OpenGL32.Lib OpenGL32.lib
@@ -101,7 +103,7 @@ RUN x86_64-w64-mingw32-g++-win32 -std=c++17 -Wall -static-libgcc -static-libstdc
 RUN apt-get install -y zip
 
 RUN mkdir able
-RUN cp *.exe *.wav font.png sprites/*.png level.dat able/
+RUN cp -r *.exe assets/ sounds/ sprites/ able/
 RUN cp SDL2-2.0.16/lib/x64/SDL2.dll able/
 RUN cp SDL2_mixer-2.0.4/lib/x64/SDL2_mixer.dll able/
 RUN cp SDL2_image.dll able/
