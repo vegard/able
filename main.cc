@@ -134,6 +134,13 @@ static std::vector<struct player_draw_data> current_recording;
 
 /* Assets */
 
+struct level {
+	unsigned int nr_polygons;
+	struct shape_user_data *polygons;
+};
+
+struct level *level;
+
 struct texture {
         SDL_Surface *surface;
         GLuint id;
@@ -235,34 +242,38 @@ out_close:
 
 /* Game logic */
 
-static void read_level(const char *path)
+static struct level *read_level(const char *path)
 {
 	FILE *fp = fopen(path, "rb");
 	if (!fp)
 		exit(1);
 
+	struct level *level = new struct level();
+
 	uint32_t nr_polygons = 0;
 	if (fread(&nr_polygons, sizeof(nr_polygons), 1, fp) != 1)
 		exit(1);
 
-	struct shape_user_data *all_user_data = new struct shape_user_data[nr_polygons];
-	for (unsigned int i = 0; i < nr_polygons; ++i) {
-		struct shape_user_data *user_data = &all_user_data[i];
+	level->nr_polygons = nr_polygons;
 
-		if (fread(user_data->color, sizeof(*user_data->color), 4, fp) != 4)
+	struct shape_user_data *polygons = new struct shape_user_data[nr_polygons];
+	for (unsigned int i = 0; i < nr_polygons; ++i) {
+		struct shape_user_data *polygon = &polygons[i];
+
+		if (fread(polygon->color, sizeof(*polygon->color), 4, fp) != 4)
 			exit(1);
 
 		uint32_t filled = 0;
 		if (fread(&filled, sizeof(filled), 1, fp) != 1)
 			exit(1);
 
-		user_data->filled = filled;
+		polygon->filled = filled;
 
 		uint32_t nr_verts = 0;
 		if (fread(&nr_verts, sizeof(nr_verts), 1, fp) != 1)
 			exit(1);
 
-		user_data->nr_verts = nr_verts;
+		polygon->nr_verts = nr_verts;
 
 		cpVect *verts = new cpVect[nr_verts];
 		for (unsigned int j = 0; j < nr_verts; ++j) {
@@ -273,18 +284,30 @@ static void read_level(const char *path)
 			verts[j] = cpv(x[0], x[1]);
 		}
 
-		user_data->verts = verts;
+		polygon->verts = verts;
 
-		cpShape *level = cpPolyShapeNew(staticBody, nr_verts, verts, cpTransformIdentity, 0);
-		cpShapeSetElasticity(level, .2);
-		cpShapeSetFriction(level, 1.);
-		cpShapeSetCollisionType(level, 0);
-		cpShapeSetFilter(level, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
-		cpShapeSetUserData(level, user_data);
-		cpSpaceAddShape(space, level);
 	}
 
+	level->polygons = polygons;
+
 	fclose(fp);
+
+	return level;
+}
+
+static void use_level(struct level *level)
+{
+	for (unsigned int i = 0; i < level->nr_polygons; ++i) {
+		struct shape_user_data *polygon = &level->polygons[i];
+
+		cpShape *shape = cpPolyShapeNew(staticBody, polygon->nr_verts, polygon->verts, cpTransformIdentity, 0);
+		cpShapeSetElasticity(shape, .2);
+		cpShapeSetFriction(shape, 1.);
+		cpShapeSetCollisionType(shape, 0);
+		cpShapeSetFilter(shape, cpShapeFilterNew(0, 1 << CP_CATEGORY_LEVEL, ~(1 << CP_CATEGORY_RAGDOLL)));
+		cpShapeSetUserData(shape, polygon);
+		cpSpaceAddShape(space, shape);
+	}
 }
 
 static void game_init()
@@ -298,7 +321,7 @@ static void game_init()
 
 	staticBody = cpSpaceGetStaticBody(space);
 
-	read_level("level.dat");
+	use_level(level);
 
 	{
 		cpFloat mass = 1.;
@@ -1134,6 +1157,7 @@ static void update()
 
 int main(int argc, char *argv[])
 {
+	level = read_level("level.dat");
 	read_recording(pb_filename, recording);
 
 	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0)
