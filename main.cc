@@ -1004,7 +1004,7 @@ static unsigned int scancode_w = SDL_SCANCODE_W;
 static unsigned int scancode_o = SDL_SCANCODE_O;
 static unsigned int scancode_p = SDL_SCANCODE_P;
 
-static SDL_Joystick *joystick;
+static SDL_GameController *controller;
 
 static void update()
 {
@@ -1079,25 +1079,15 @@ static void update()
 			keys |= KEY_P;
 	}
 
-	if (joystick) {
-		// This works for my Xbox controller on Linux
-		if (SDL_JoystickGetButton(joystick, 4))
+	if (controller) {
+		if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_LEFTSHOULDER))
 			keys |= KEY_Q;
-		if (SDL_JoystickGetAxis(joystick, 2) > 0)
+		if (SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT) > 0)
 			keys |= KEY_W;
-		if (SDL_JoystickGetAxis(joystick, 5) > 0)
+		if (SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 0)
 			keys |= KEY_O;
-		if (SDL_JoystickGetButton(joystick, 5))
+		if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER))
 			keys |= KEY_P;
-
-#if 0 // debug
-		for (unsigned int i = 0; i < SDL_JoystickNumButtons(joystick); ++i)
-			fprintf(stderr, "%u:%u ", i,SDL_JoystickGetButton(joystick, i));
-		fprintf(stderr, "| ");
-		for (unsigned int i = 0; i < SDL_JoystickNumAxes(joystick); ++i)
-			fprintf(stderr, "%u:%d ", i, SDL_JoystickGetAxis(joystick, i));
-		fprintf(stderr, "\n");
-#endif
 	}
 
 	unsigned int keys_pressed = ~keys_prev & keys;
@@ -1216,7 +1206,7 @@ int main(int argc, char *argv[])
 	level = read_level("level.dat");
 	read_recording(pb_filename, recording);
 
-	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_JOYSTICK) != 0)
+	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER) != 0)
 		exit(1);
 
 	Mix_Init(0);
@@ -1246,8 +1236,14 @@ int main(int argc, char *argv[])
 
 	SDL_JoystickEventState(SDL_ENABLE);
 
-	if (SDL_NumJoysticks() > 0)
-		joystick = SDL_JoystickOpen(0);
+	for (unsigned int i = 0, n = SDL_NumJoysticks(); i < n; ++i) {
+		if (!SDL_IsGameController(i))
+			continue;
+
+		controller = SDL_GameControllerOpen(i);
+		if (controller)
+			break;
+	}
 
 	init();
 
@@ -1291,8 +1287,8 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	if (joystick)
-		SDL_JoystickClose(joystick);
+	if (controller)
+		SDL_GameControllerClose(controller);
 
 	Mix_CloseAudio();
 	SDL_Quit();
