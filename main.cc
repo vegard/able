@@ -1004,6 +1004,8 @@ static unsigned int scancode_w = SDL_SCANCODE_W;
 static unsigned int scancode_o = SDL_SCANCODE_O;
 static unsigned int scancode_p = SDL_SCANCODE_P;
 
+static SDL_Joystick *joystick;
+
 static void update()
 {
 	/* Process collisions */
@@ -1075,6 +1077,27 @@ static void update()
 			keys |= KEY_O;
 		if (state[scancode_p])
 			keys |= KEY_P;
+	}
+
+	if (joystick) {
+		// This works for my Xbox controller on Linux
+		if (SDL_JoystickGetButton(joystick, 4))
+			keys |= KEY_Q;
+		if (SDL_JoystickGetAxis(joystick, 2) > 0)
+			keys |= KEY_W;
+		if (SDL_JoystickGetAxis(joystick, 5) > 0)
+			keys |= KEY_O;
+		if (SDL_JoystickGetButton(joystick, 5))
+			keys |= KEY_P;
+
+#if 0 // debug
+		for (unsigned int i = 0; i < SDL_JoystickNumButtons(joystick); ++i)
+			fprintf(stderr, "%u:%u ", i,SDL_JoystickGetButton(joystick, i));
+		fprintf(stderr, "| ");
+		for (unsigned int i = 0; i < SDL_JoystickNumAxes(joystick); ++i)
+			fprintf(stderr, "%u:%d ", i, SDL_JoystickGetAxis(joystick, i));
+		fprintf(stderr, "\n");
+#endif
 	}
 
 	unsigned int keys_pressed = ~keys_prev & keys;
@@ -1193,7 +1216,7 @@ int main(int argc, char *argv[])
 	level = read_level("level.dat");
 	read_recording(pb_filename, recording);
 
-	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0)
+	if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_JOYSTICK) != 0)
 		exit(1);
 
 	Mix_Init(0);
@@ -1220,6 +1243,11 @@ int main(int argc, char *argv[])
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
 	glcontext = SDL_GL_CreateContext(window);
 	SDL_GL_SetSwapInterval(1);
+
+	SDL_JoystickEventState(SDL_ENABLE);
+
+	if (SDL_NumJoysticks() > 0)
+		joystick = SDL_JoystickOpen(0);
 
 	init();
 
@@ -1262,6 +1290,9 @@ int main(int argc, char *argv[])
 				SDL_Delay(can_sleep);
 		}
 	}
+
+	if (joystick)
+		SDL_JoystickClose(joystick);
 
 	Mix_CloseAudio();
 	SDL_Quit();
