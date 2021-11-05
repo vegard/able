@@ -935,59 +935,6 @@ static void keyboard(SDL_KeyboardEvent *key)
 		return;
 
 	switch (key->keysym.sym) {
-	case SDLK_q:
-		if (!left_hand_out) {
-			// shoot out left hand
-			left_hand_out = true;
-			left_hand_stop = NULL;
-
-			cpSpaceAddConstraint(space, leftHandOutJoint);
-
-			cpVect head_pos = cpBodyGetPosition(headBody);
-
-			cpSpaceAddShape(space, leftHandShape);
-
-			//cpBodySetPosition(leftHandBody, cpBodyLocalToWorld(headBody, cpv(-head_radius - hand_radius, 0)));
-			cpBodySetPosition(leftHandBody, cpBodyLocalToWorld(headBody, cpv(-head_radius + 2. * hand_radius, 0)));
-			cpBodySetVelocity(leftHandBody, cpBodyGetVelocity(headBody));
-			cpSpaceAddBody(space, leftHandBody);
-
-			cpBodyApplyImpulseAtWorldPoint(leftHandBody,
-				//cpv(-5, 0),
-				cpBodyLocalToWorld(headBody, cpv(-hand_velocity, -hand_velocity)) - cpBodyLocalToWorld(headBody, cpv(0, 0)),
-				head_pos);
-		} else {
-			release_left();
-		}
-
-		break;
-
-	case SDLK_p:
-		if (!right_hand_out) {
-			// shoot out right hand
-			right_hand_out = true;
-			right_hand_stop = NULL;
-
-			cpSpaceAddConstraint(space, rightHandOutJoint);
-
-			cpVect head_pos = cpBodyGetPosition(headBody);
-
-			cpSpaceAddShape(space, rightHandShape);
-
-			//cpBodySetPosition(rightHandBody, cpBodyLocalToWorld(headBody, cpv(head_radius + hand_radius, 0)));
-			cpBodySetPosition(rightHandBody, cpBodyLocalToWorld(headBody, cpv(head_radius - 2. * hand_radius, 0)));
-			cpBodySetVelocity(rightHandBody, cpBodyGetVelocity(headBody));
-			cpSpaceAddBody(space, rightHandBody);
-
-			cpBodyApplyImpulseAtWorldPoint(rightHandBody,
-				//cpv(5, 0),
-				cpBodyLocalToWorld(headBody, cpv(hand_velocity, -hand_velocity)) - cpBodyLocalToWorld(headBody, cpv(0, 0)),
-				head_pos);
-		} else {
-			release_right();
-		}
-
-		break;
 
 	case SDLK_r:
 		{
@@ -1043,8 +990,24 @@ static void keyboard(SDL_KeyboardEvent *key)
 	}
 }
 
+enum able_keys {
+	KEY_Q = 1 << 0,
+	KEY_W = 1 << 1,
+	KEY_O = 1 << 2,
+	KEY_P = 1 << 3,
+};
+
+static unsigned int keys_prev = 0;
+
+static unsigned int scancode_q = SDL_SCANCODE_Q;
+static unsigned int scancode_w = SDL_SCANCODE_W;
+static unsigned int scancode_o = SDL_SCANCODE_O;
+static unsigned int scancode_p = SDL_SCANCODE_P;
+
 static void update()
 {
+	/* Process collisions */
+
 	if (head_collision && head_collision_started) {
 		static float force;
 
@@ -1098,17 +1061,87 @@ static void update()
 		right_hand_stop = NULL;
 	}
 
-	const Uint8 *state = SDL_GetKeyboardState(NULL);
+	/* Read player input */
+
+	unsigned int keys = 0;
+	{
+		const Uint8 *state = SDL_GetKeyboardState(NULL);
+
+		if (state[scancode_q])
+			keys |= KEY_Q;
+		if (state[scancode_w])
+			keys |= KEY_W;
+		if (state[scancode_o])
+			keys |= KEY_O;
+		if (state[scancode_p])
+			keys |= KEY_P;
+	}
+
+	unsigned int keys_pressed = ~keys_prev & keys;
+	unsigned int keys_released = keys_prev & ~keys;
+	keys_prev = keys;
+
+	if (keys_pressed & KEY_Q) {
+		if (!left_hand_out) {
+			// shoot out left hand
+			left_hand_out = true;
+			left_hand_stop = NULL;
+
+			cpSpaceAddConstraint(space, leftHandOutJoint);
+
+			cpVect head_pos = cpBodyGetPosition(headBody);
+
+			cpSpaceAddShape(space, leftHandShape);
+
+			//cpBodySetPosition(leftHandBody, cpBodyLocalToWorld(headBody, cpv(-head_radius - hand_radius, 0)));
+			cpBodySetPosition(leftHandBody, cpBodyLocalToWorld(headBody, cpv(-head_radius + 2. * hand_radius, 0)));
+			cpBodySetVelocity(leftHandBody, cpBodyGetVelocity(headBody));
+			cpSpaceAddBody(space, leftHandBody);
+
+			cpBodyApplyImpulseAtWorldPoint(leftHandBody,
+				//cpv(-5, 0),
+				cpBodyLocalToWorld(headBody, cpv(-hand_velocity, -hand_velocity)) - cpBodyLocalToWorld(headBody, cpv(0, 0)),
+				head_pos);
+		} else {
+			release_left();
+		}
+	}
+
+	if (keys_pressed & KEY_P) {
+		if (!right_hand_out) {
+			// shoot out right hand
+			right_hand_out = true;
+			right_hand_stop = NULL;
+
+			cpSpaceAddConstraint(space, rightHandOutJoint);
+
+			cpVect head_pos = cpBodyGetPosition(headBody);
+
+			cpSpaceAddShape(space, rightHandShape);
+
+			//cpBodySetPosition(rightHandBody, cpBodyLocalToWorld(headBody, cpv(head_radius + hand_radius, 0)));
+			cpBodySetPosition(rightHandBody, cpBodyLocalToWorld(headBody, cpv(head_radius - 2. * hand_radius, 0)));
+			cpBodySetVelocity(rightHandBody, cpBodyGetVelocity(headBody));
+			cpSpaceAddBody(space, rightHandBody);
+
+			cpBodyApplyImpulseAtWorldPoint(rightHandBody,
+				//cpv(5, 0),
+				cpBodyLocalToWorld(headBody, cpv(hand_velocity, -hand_velocity)) - cpBodyLocalToWorld(headBody, cpv(0, 0)),
+				head_pos);
+		} else {
+			release_right();
+		}
+	}
 
 	if (leftHandSpring) {
-		if (state[SDL_SCANCODE_W])
+		if (keys & KEY_W)
 			cpDampedSpringSetRestLength(leftHandSpring, min_arm_length);
 		else
 			cpDampedSpringSetRestLength(leftHandSpring, max_arm_length);
 	}
 
 	if (rightHandSpring) {
-		if (state[SDL_SCANCODE_O])
+		if (keys & KEY_O)
 			cpDampedSpringSetRestLength(rightHandSpring, min_arm_length);
 		else
 			cpDampedSpringSetRestLength(rightHandSpring, max_arm_length);
