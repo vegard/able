@@ -42,7 +42,11 @@ The specific packages and external libraries I used for the Windows build were:
 * <https://software-download.microsoft.com/download/pr/18362.1.190318-1202.19h1_release_WindowsSDK.iso> (Windows SDK)
 * <https://archive.mesa3d.org/mesa-19.3.2.tar.xz> (for OpenGL headers only)
 
-Reach out if you need help building for Windows from Linux. I may be able to provide a Dockerfile that does everything.
+To build using Docker, run:
+
+    DOCKER_BUILDKIT=1 docker build --output type=local,dest=output -f Dockerfile.mingw32 .
+
+This will generate an archive in `output/`.
 
 
 ## Disclaimer

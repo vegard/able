@@ -1,0 +1,113 @@
+FROM ubuntu:bionic AS build-stage
+
+RUN apt-get update
+RUN apt-get install -y wget
+
+WORKDIR /root/
+
+
+#
+# Windows libraries
+#
+
+# Windows libraries
+RUN wget https://software-download.microsoft.com/download/pr/18362.1.190318-1202.19h1_release_WindowsSDK.iso
+
+# use 7zip to extract the .msi files
+RUN apt-get install -y p7zip-full p7zip-rar
+
+# The .msi files are not self-contained, but reference .cab files in the
+# same directory, so let's just extract everything.
+RUN 7z x 18362.1.190318-1202.19h1_release_WindowsSDK.iso "Installers/"
+
+# This should have been enough; unfortunately, the msitools that comes with
+# bionic is buggy and can't open our files for some reason.
+#RUN apt-get install -y msitools
+#RUN msiextract "Installers/Windows SDK Desktop Libs x64-x86_en-us.msi"
+
+RUN apt-get install -y git
+RUN apt-get install -y autoconf autopoint
+RUN git clone https://gitlab.gnome.org/GNOME/msitools.git
+RUN cd msitools && git checkout e105bd1b4cdb14b6008086b6d10640372863cc73
+
+RUN apt-get install -y binutils
+RUN apt-get install -y libtool
+RUN apt-get install -y bison
+RUN apt-get install -y libglib2.0-dev
+RUN apt-get install -y libgsf-1-dev
+RUN apt-get install -y uuid-dev
+RUN apt-get install -y gobject-introspection
+RUN apt-get install -y valac
+RUN apt-get install -y libgcab-dev
+RUN apt-get install -y libmsi-dev
+RUN cd msitools && ./autogen.sh
+RUN cd msitools && ./configure && make && make install
+
+RUN msiextract "Installers/Windows SDK Desktop Libs x64-x86_en-us.msi"
+#RUN msiextract "Installers/Windows SDK Desktop Headers x64-x86_en-us.msi"
+
+
+#
+# Other libraries
+#
+
+# Chipmunk 2D for physics
+RUN wget https://chipmunk-physics.net/release/Chipmunk-7.x/Chipmunk-7.0.3.tgz
+
+# SDL2
+RUN wget https://www.libsdl.org/release/SDL2-devel-2.0.16-VC.zip
+RUN wget https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-2.0.4-VC.zip
+RUN wget https://www.libsdl.org/projects/SDL_image/release/SDL2_image-2.0.5-win32-x64.zip
+RUN wget https://www.libsdl.org/projects/SDL_image/release/SDL2_image-2.0.5.zip
+
+# OpenGL headers
+RUN wget https://archive.mesa3d.org/mesa-19.3.2.tar.xz
+
+RUN apt-get install -y unzip
+
+RUN tar xzvf Chipmunk-7.0.3.tgz
+RUN unzip SDL2-devel-2.0.16-VC.zip
+RUN unzip SDL2_mixer-devel-2.0.4-VC.zip
+RUN unzip SDL2_image-2.0.5-win32-x64.zip
+RUN unzip SDL2_image-2.0.5.zip
+RUN tar xJvf mesa-19.3.2.tar.xz
+
+
+#
+# Windows cross-compiler/toolchain
+#
+
+RUN apt-get install -y g++-mingw-w64-x86-64
+
+
+#
+# Build it!
+#
+
+ADD *.wav *.png ./
+ADD *.cc *.c ./
+
+# OMG... gcc won't be able to find this unless the suffix is all-lowercase
+RUN cd "Program Files/Windows Kits/10/Lib/10.0.18362.0/um/x64/" && cp OpenGL32.Lib OpenGL32.lib
+
+# Compile it...
+RUN x86_64-w64-mingw32-g++-win32 -std=c++17 -Wall -static-libgcc -static-libstdc++ -g -D_GNU_SOURCE -Imesa-19.3.2/include/ -ISDL2-2.0.16/include/ -ISDL2_mixer-2.0.4/include/ -ISDL2_image-2.0.5/ -IChipmunk-7.0.3/include -mwindows -o able.exe main.cc Chipmunk-7.0.3/src/*.c -L"Program Files/Windows Kits/10/Lib/10.0.18362.0/um/x64/" -LSDL2-2.0.16/lib/x64/ -LSDL2_mixer-2.0.4/lib/x64/ -L. -lSDL2main -lOpenGL32 -lglu32 -luser32 -lSDL2 -lSDL2_mixer -lSDL2_image
+
+
+#
+# Generate output archive
+#
+
+RUN apt-get install -y zip
+
+RUN mkdir able
+RUN cp *.exe *.wav *.png able/
+RUN cp SDL2-2.0.16/lib/x64/SDL2.dll able/
+RUN cp SDL2_mixer-2.0.4/lib/x64/SDL2_mixer.dll able/
+RUN cp SDL2_image.dll able/
+RUN cp libpng16-16.dll able/
+RUN cp zlib1.dll able/
+RUN zip -r able.zip able/
+
+FROM scratch AS export-stage
+COPY --from=build-stage /root/able.zip /
